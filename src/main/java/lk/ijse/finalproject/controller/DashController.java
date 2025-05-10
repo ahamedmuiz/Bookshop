@@ -81,6 +81,7 @@ public class DashController {
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             timeLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         }));
+
         clock.setCycleCount(Timeline.INDEFINITE);
         clock.play();
 
