@@ -1,6 +1,5 @@
-package lk.ijse.finalproject.dto.tm;
+package lk.ijse.finalproject.dto;
 
-import javafx.scene.control.Button;
 import lombok.*;
 
 @AllArgsConstructor
@@ -8,11 +7,11 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class CartTm {
+public class BookDto {
     private String invId;  // Changed from bId to invId
     private String category;  // Changed from name to category
     private int qty;
     private double price;
-    private double total;
-    private Button btnRemove;
+    private String categoryType;  // Additional field if needed
+    private int supId;  // Added to link with supplier
 }
