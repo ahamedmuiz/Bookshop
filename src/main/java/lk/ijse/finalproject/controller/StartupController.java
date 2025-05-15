@@ -12,7 +12,7 @@ public class StartupController {
 
 
     public void btnGoToLoginPage(ActionEvent event) throws IOException {
-        // Load loginpage.fxml
+
         try {
             Parent loginPage = FXMLLoader.load(getClass().getResource("/view/LoginPage.fxml"));
             Scene loginScene = new Scene(loginPage);

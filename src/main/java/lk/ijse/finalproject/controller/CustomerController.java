@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import lk.ijse.finalproject.dto.CustomerDto;
 import lk.ijse.finalproject.model.CustomerModel;
 
@@ -26,6 +27,7 @@ public class CustomerController {
     private final CustomerModel customerModel = new CustomerModel();
 
     public void initialize() {
+
         colId.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getCId()).asObject());
         colName.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
         colEmail.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getEmail()));

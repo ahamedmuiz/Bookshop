@@ -127,7 +127,8 @@ public class DashController {
             }
         }
 
-        // Highlight clicked button
+        // clicked button become yellow in dashboard
+
         clickedButton.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;");
 
         // Load UI

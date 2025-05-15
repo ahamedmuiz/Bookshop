@@ -6,10 +6,9 @@ public class SupplierDto {
     private String contact;
     private String address;
 
-    // Default constructor
     public SupplierDto() {}
 
-    // Parameterized constructor
+
     public SupplierDto(int supId, String name, String contact, String address) {
         this.supId = supId;
         this.name = name;

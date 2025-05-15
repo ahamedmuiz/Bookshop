@@ -9,7 +9,7 @@ import java.util.List;
 
 public class EmployeeModel {
 
-    // Add a new employee to the database
+
     public static boolean addEmployee(EmployeeDto employee) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO Employee (E_ID, E_Name, E_Email, E_Contact) VALUES (?, ?, ?, ?)";
         Connection con = DBConnection.getInstance().getConnection();
@@ -21,7 +21,6 @@ public class EmployeeModel {
         return pstm.executeUpdate() > 0;
     }
 
-    // Delete an employee from the database using their ID
     public static boolean deleteEmployee(String eId) throws SQLException, ClassNotFoundException {
         String sql = "DELETE FROM Employee WHERE E_ID = ?";
         Connection con = DBConnection.getInstance().getConnection();
@@ -30,7 +29,6 @@ public class EmployeeModel {
         return pstm.executeUpdate() > 0;
     }
 
-    // Update employee details in the database
     public static boolean updateEmployee(EmployeeDto employee) throws SQLException, ClassNotFoundException {
         String sql = "UPDATE Employee SET E_Name = ?, E_Email = ?, E_Contact = ? WHERE E_ID = ?";
         Connection con = DBConnection.getInstance().getConnection();
@@ -42,7 +40,6 @@ public class EmployeeModel {
         return pstm.executeUpdate() > 0;
     }
 
-    // Search for an employee by ID and return their details
     public static EmployeeDto searchEmployee(String eId) throws SQLException, ClassNotFoundException {
         String sql = "SELECT * FROM Employee WHERE E_ID = ?";
         Connection con = DBConnection.getInstance().getConnection();
@@ -61,7 +58,6 @@ public class EmployeeModel {
         return null;
     }
 
-    // Retrieve all employees from the database
     public static List<EmployeeDto> getAllEmployees() throws SQLException, ClassNotFoundException {
         List<EmployeeDto> employeeList = new ArrayList<>();
         String sql = "SELECT * FROM Employee";

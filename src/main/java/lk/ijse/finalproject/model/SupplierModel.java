@@ -9,18 +9,15 @@ import java.util.List;
 
 public class SupplierModel {
 
-    // Add a new supplier to the database
     public static boolean addSupplier(SupplierDto dto) throws SQLException {
         Connection con = DBConnection.getInstance().getConnection();
 
-        // Use INT for Sup_ID consistently
         String checkSql = "SELECT Sup_ID FROM Supplier WHERE Sup_ID = ?";
         PreparedStatement checkStmt = con.prepareStatement(checkSql);
         checkStmt.setInt(1, dto.getSupId());
         ResultSet rs = checkStmt.executeQuery();
 
         if (rs.next()) {
-            // ID already exists
             return false;
         }
 
@@ -35,7 +32,6 @@ public class SupplierModel {
     }
 
 
-    // Update an existing supplier
     public boolean updateSupplier(SupplierDto dto) throws SQLException {
         String sql = "UPDATE Supplier SET Name=?, Contact=?, Address=? WHERE Sup_ID=?";
         try (Connection con = DBConnection.getInstance().getConnection();
@@ -58,7 +54,6 @@ public class SupplierModel {
         }
     }
 
-    // Search for a supplier by ID
     public SupplierDto searchSupplier(int supId) throws SQLException {
         String sql = "SELECT * FROM Supplier WHERE Sup_ID=?";
         try (Connection con = DBConnection.getInstance().getConnection();
@@ -77,7 +72,6 @@ public class SupplierModel {
         return null;
     }
 
-    // Get all suppliers
     public List<SupplierDto> getAllSuppliers() throws SQLException {
         List<SupplierDto> list = new ArrayList<>();
         String sql = "SELECT * FROM Supplier";
@@ -96,7 +90,6 @@ public class SupplierModel {
         return list;
     }
 
-    // Get all supplier IDs (for ComboBox, etc.)
     public List<Integer> getAllSupplierIds() throws SQLException {
         List<Integer> list = new ArrayList<>();
         String sql = "SELECT Sup_ID FROM Supplier";
@@ -110,7 +103,6 @@ public class SupplierModel {
         return list;
     }
 
-    // Check if a supplier exists
     public boolean isSupplierExists(int supplierId) throws SQLException {
         String sql = "SELECT Sup_ID FROM Supplier WHERE Sup_ID = ?";
         try (Connection connection = DBConnection.getInstance().getConnection();
