@@ -1,14 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<?import java.lang.String?>
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="lk.ijse.finalproject.controller.SaleController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefHeight="700.0" prefWidth="1100.0"
+            style="-fx-background-color: #f5f7fa;">
 
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="1100.0"
+          style="-fx-background-color: #2c3e50; -fx-padding: 0 20;">
+        <Label text="Sales Analytics Dashboard"
+               style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblLastUpdated" text="Last updated: Today, 10:30 AM"
+               style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;"/>
+    </HBox>
+
+    <!-- Filter Bar -->
+    <HBox layoutY="70.0" prefHeight="60.0" prefWidth="1100.0" alignment="CENTER_LEFT"
+          style="-fx-background-color: #ecf0f1; -fx-padding: 0 20;" spacing="20">
+        <Label text="Filter By:" style="-fx-font-weight: bold;"/>
+
+        <ComboBox fx:id="cmbTimePeriod" prefWidth="150">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Today"/>
+                    <String fx:value="This Week"/>
+                    <String fx:value="This Month"/>
+                    <String fx:value="This Year"/>
+                    <String fx:value="Custom Range"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <DatePicker fx:id="dpStartDate" promptText="Start Date" disable="true"/>
+        <DatePicker fx:id="dpEndDate" promptText="End Date" disable="true"/>
+
+        <ComboBox fx:id="cmbSalesRep" promptText="All Sales Reps" prefWidth="180"/>
+
+        <Button text="Apply Filters" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+        <Button text="Export Report" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+    </HBox>
+
+    <!-- Order Management -->
+    <VBox layoutY="150.0" spacing="15" style="-fx-padding: 20;">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Order Status:" style="-fx-font-weight: bold;"/>
+
+            <!-- Radio Buttons without ToggleGroup -->
+            <RadioButton text="All" fx:id="rbAll" selected="true"/>
+            <RadioButton text="Completed" fx:id="rbCompleted"/>
+            <RadioButton text="Pending" fx:id="rbPending"/>
+            <RadioButton text="Cancelled" fx:id="rbCancelled"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtOrderSearch" promptText="Search orders..." prefWidth="250"/>
+            <Button text="Search" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+        </HBox>
+
+        <TableView fx:id="tblOrders" prefHeight="400">
+            <columns>
+                <TableColumn text="Order ID" prefWidth="100" fx:id="colOrderId"/>
+                <TableColumn text="Date" prefWidth="120" fx:id="colOrderDate"/>
+                <TableColumn text="Customer" prefWidth="200" fx:id="colCustomer"/>
+                <TableColumn text="Amount" prefWidth="120" fx:id="colAmount"/>
+                <TableColumn text="Status" prefWidth="120" fx:id="colStatus"/>
+                <TableColumn text="Payment" prefWidth="120" fx:id="colPayment"/>
+                <TableColumn text="Actions" prefWidth="150" fx:id="colActions"/>
+            </columns>
+        </TableView>
+    </VBox>
 </AnchorPane>

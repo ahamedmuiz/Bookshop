@@ -147,6 +147,15 @@ public class DashController {
         else if (clickedButton == btnEmployees) {
             loadUI("EmployeePage");
         }
+        else if (clickedButton == btnAttendance) {
+            loadUI("AttendancePage");
+        }
+        else if (clickedButton == btnSalary) {
+            loadUI("SalaryPage");
+        }
+        else if (clickedButton == btnSales) {
+            loadUI("SalePage");
+        }
     }
 
 
