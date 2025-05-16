@@ -1,16 +1,13 @@
 package lk.ijse.finalproject.controller;
 
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import lk.ijse.finalproject.dto.InventoryDto;
-import lk.ijse.finalproject.dto.SupplierDto;
+import lk.ijse.finalproject.dto.tm.InventoryTm;
 import lk.ijse.finalproject.model.InventoryModel;
 import lk.ijse.finalproject.model.SupplierModel;
 
@@ -20,386 +17,312 @@ import java.util.List;
 import java.util.Optional;
 
 public class InventoryController {
-    @FXML private TextField txtInventoryId;
-    @FXML private ComboBox<Integer> cmbSupplierId;
-    @FXML private TextField txtSupplierName;
-    @FXML private TextField txtCurrentQuantity;
-    @FXML private TextField txtQuantityAdjustment;
-    @FXML private ComboBox<String> cmbQuantityOperation;
-    @FXML private TextField txtNewQuantity;
-    @FXML private DatePicker dpLastUpdate;
-    @FXML private TextField txtCategory;
-    @FXML private TextField txtPrice;
-    @FXML private TableView<InventoryDto> tblInventory;
-    @FXML private TableColumn<InventoryDto, Integer> colInventoryId;
-    @FXML private TableColumn<InventoryDto, Integer> colSupplierId;
-    @FXML private TableColumn<InventoryDto, String> colSupplierName;
-    @FXML private TableColumn<InventoryDto, Integer> colQuantity;
-    @FXML private TableColumn<InventoryDto, LocalDate> colLastUpdate;
-    @FXML private TableColumn<InventoryDto, String> colCategory;
-    @FXML private TableColumn<InventoryDto, Double> colPrice;
-    @FXML private Button btnAdd;
-    @FXML private Button btnUpdate;
-    @FXML private Button btnDelete;
-    @FXML private Button btnSearch;
-    @FXML private Button btnClear;
-    @FXML private Button btnLoadAll;
-    @FXML private TextField txtSearch;
 
-    private final InventoryModel inventoryModel = new InventoryModel();
-    private final SupplierModel supplierModel = new SupplierModel();
+    @FXML private Button btnAdd;
+    @FXML private Button btnClear;
+    @FXML private Button btnDelete;
+    @FXML private Button btnLoadAll;
+    @FXML private Button btnSearch;
+    @FXML private Button btnSearchAnyField;
+    @FXML private Button btnUpdate;
+    @FXML private ComboBox<String> cmbQuantityOperation;
+    @FXML private ComboBox<String> cmbSupplierId;
+    @FXML private TableColumn<?, ?> colCategory;
+    @FXML private TableColumn<?, ?> colInventoryId;
+    @FXML private TableColumn<?, ?> colLastUpdate;
+    @FXML private TableColumn<?, ?> colPrice;
+    @FXML private TableColumn<?, ?> colQuantity;
+    @FXML private TableColumn<?, ?> colSupplierId;
+    @FXML private TableColumn<?, ?> colSupplierName;
+    @FXML private DatePicker dpLastUpdate;
+    @FXML private TableView<InventoryTm> tblInventory;
+    @FXML private TextField txtCategory;
+    @FXML private TextField txtCurrentQuantity;
+    @FXML private TextField txtInventoryId;
+    @FXML private TextField txtNewQuantity;
+    @FXML private TextField txtPrice;
+    @FXML private TextField txtQuantityAdjustment;
+    @FXML private TextField txtSearch;
+    @FXML private TextField txtSupplierName;
 
     public void initialize() {
-        initializeTableColumns();
-        setupForm();
-        loadAllInventory();
-        setupTableSelectionListener();
-        setupQuantityUpdateListener();
-        addTextValidations();
-    }
-
-    private void initializeTableColumns() {
-        colInventoryId.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getInvId()).asObject());
-        colSupplierId.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getSupId()).asObject());
-        colSupplierName.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getSupplierName()));
-        colQuantity.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getStockQty()).asObject());
-        colLastUpdate.setCellValueFactory(data ->
-                new SimpleObjectProperty<>(data.getValue().getLastUpdate()));
-        colCategory.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getCategory()));
-        colPrice.setCellValueFactory(data ->
-                new SimpleDoubleProperty(data.getValue().getPrice()).asObject());
-    }
-
-    private void setupForm() {
-        generateNewInventoryId();
-        txtInventoryId.setEditable(false);
-        dpLastUpdate.setValue(LocalDate.now());
+        setCellValueFactory();
         loadSupplierIds();
-        setupSupplierIdListener();
+        loadQuantityOperations();
+        generateNextInventoryId();
+        setListener();
+        loadAllInventory();
 
-        cmbQuantityOperation.setItems(FXCollections.observableArrayList("Add", "Subtract", "Set"));
-        cmbQuantityOperation.getSelectionModel().selectFirst();
-
-        clearFormFields();
-        setupButtonStates();
-    }
-
-    private void clearFormFields() {
-        txtSupplierName.clear();
-        txtCurrentQuantity.clear();
-        txtQuantityAdjustment.clear();
-        txtNewQuantity.clear();
-        txtCategory.clear();
-        txtPrice.clear();
-    }
-
-    private void setupQuantityUpdateListener() {
-        cmbQuantityOperation.valueProperty().addListener((obs, oldVal, newVal) -> calculateNewQuantity());
-        txtQuantityAdjustment.textProperty().addListener((obs, oldVal, newVal) -> calculateNewQuantity());
-        txtCurrentQuantity.textProperty().addListener((obs, oldVal, newVal) -> calculateNewQuantity());
-    }
-
-    private void calculateNewQuantity() {
-        try {
-            String currentQtyText = txtCurrentQuantity.getText();
-            String adjustmentText = txtQuantityAdjustment.getText();
-
-            if (isEmptyOrNull(currentQtyText) || isEmptyOrNull(adjustmentText)) {
-                txtNewQuantity.clear();
-                return;
+        // Add table selection listener
+        tblInventory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                setFields(newSelection);
             }
-
-            int currentQty = Integer.parseInt(currentQtyText);
-            int adjustment = Integer.parseInt(adjustmentText);
-            String operation = cmbQuantityOperation.getValue();
-
-            int newQty;
-            switch (operation) {
-                case "Add":
-                    newQty = currentQty + adjustment;
-                    break;
-                case "Subtract":
-                    newQty = currentQty - adjustment;
-                    if (newQty < 0) {
-                        showAlert(Alert.AlertType.WARNING, "Cannot have negative quantity!");
-                        return;
-                    }
-                    break;
-                case "Set":
-                    newQty = adjustment;
-                    break;
-                default:
-                    newQty = currentQty;
-            }
-
-            txtNewQuantity.setText(String.valueOf(newQty));
-        } catch (NumberFormatException e) {
-            txtNewQuantity.clear();
-        }
+        });
     }
 
-    private void generateNewInventoryId() {
-        try {
-            int nextId = inventoryModel.generateNextInventoryId();
-            txtInventoryId.setText(String.valueOf(nextId));
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating inventory ID: " + e.getMessage());
-            txtInventoryId.setText("");
-        }
+
+    private void setCellValueFactory() {
+        colInventoryId.setCellValueFactory(new PropertyValueFactory<>("invId"));
+        colSupplierId.setCellValueFactory(new PropertyValueFactory<>("supId"));
+        colSupplierName.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
+        colQuantity.setCellValueFactory(new PropertyValueFactory<>("stockQty"));
+        colLastUpdate.setCellValueFactory(new PropertyValueFactory<>("lastUpdate"));
+        colCategory.setCellValueFactory(new PropertyValueFactory<>("category"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
 
     private void loadSupplierIds() {
         try {
-            List<Integer> ids = supplierModel.getAllSupplierIds();
-            cmbSupplierId.setItems(FXCollections.observableArrayList(ids));
+            List<Integer> supplierIds = SupplierModel.getAllSupplierIds();
+            cmbSupplierId.getItems().clear();
+            supplierIds.forEach(id -> cmbSupplierId.getItems().add(String.valueOf(id)));
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error loading supplier IDs: " + e.getMessage());
+            showAlert("Failed to load supplier IDs", Alert.AlertType.ERROR);
         }
     }
 
-    private void setupSupplierIdListener() {
-        cmbSupplierId.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
+    private void loadQuantityOperations() {
+        cmbQuantityOperation.getItems().addAll("Add", "Subtract", "Set");
+        cmbQuantityOperation.getSelectionModel().selectFirst();
+    }
+
+    private void generateNextInventoryId() {
+        try {
+            String nextId = InventoryModel.generateNextInventoryId();
+            txtInventoryId.setText(nextId);
+        } catch (SQLException e) {
+            showAlert("Failed to generate ID", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void setListener() {
+        cmbSupplierId.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
                 try {
-                    SupplierDto supplier = supplierModel.searchSupplier(newVal);
-                    txtSupplierName.setText(supplier != null ? supplier.getName() : "");
+                    String supplierName = SupplierModel.getSupplierName(newValue);
+                    txtSupplierName.setText(supplierName);
                 } catch (SQLException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error loading supplier details: " + e.getMessage());
-                    txtSupplierName.setText("");
+                    showAlert("Failed to get supplier name", Alert.AlertType.ERROR);
                 }
-            } else {
-                txtSupplierName.setText("");
+            }
+            updateButtonStates();
+        });
+
+        cmbQuantityOperation.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            calculateNewQuantity();
+        });
+
+        txtQuantityAdjustment.textProperty().addListener((observable, oldValue, newValue) -> {
+            calculateNewQuantity();
+        });
+
+        txtCurrentQuantity.textProperty().addListener((observable, oldValue, newValue) -> {
+            calculateNewQuantity();
+        });
+
+        tblInventory.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                setFields(newSelection);
             }
             updateButtonStates();
         });
     }
 
-    private void setupButtonStates() {
-        btnAdd.setDisable(true);
-        btnUpdate.setDisable(true);
-        btnDelete.setDisable(true);
 
-        cmbSupplierId.valueProperty().addListener((obs, oldVal, newVal) -> updateButtonStates());
-        txtCategory.textProperty().addListener((obs, oldVal, newVal) -> updateButtonStates());
-        txtPrice.textProperty().addListener((obs, oldVal, newVal) -> updateButtonStates());
-        txtNewQuantity.textProperty().addListener((obs, oldVal, newVal) -> updateButtonStates());
+    private void calculateNewQuantity() {
+        String operation = cmbQuantityOperation.getValue();
+        String adjustmentText = txtQuantityAdjustment.getText();
+        String currentQtyText = txtCurrentQuantity.getText();
 
-        tblInventory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            updateButtonStates();
+        if (operation != null && !adjustmentText.isEmpty() && !currentQtyText.isEmpty()) {
+            try {
+                int currentQty = Integer.parseInt(currentQtyText);
+                int adjustment = Integer.parseInt(adjustmentText);
+                int newQty = currentQty;
+
+                switch (operation) {
+                    case "Add":
+                        newQty = currentQty + adjustment;
+                        break;
+                    case "Subtract":
+                        newQty = currentQty - adjustment;
+                        if (newQty < 0) {
+                            showAlert("Cannot have negative quantity!", Alert.AlertType.WARNING);
+                            return;
+                        }
+                        break;
+                    case "Set":
+                        newQty = adjustment;
+                        break;
+                }
+
+                txtNewQuantity.setText(String.valueOf(newQty));
+            } catch (NumberFormatException e) {
+                txtNewQuantity.clear();
+            }
+        }
+    }
+
+    private void addTextValidations() {
+        txtQuantityAdjustment.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.matches("\\d*")) {
+                txtQuantityAdjustment.setText(oldValue);
+            }
+        });
+
+        txtPrice.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.matches("\\d*(\\.\\d*)?")) {
+                txtPrice.setText(oldValue);
+            }
         });
     }
 
-    private void updateButtonStates() {
+    private void setupButtonStates() {
         boolean formValid = cmbSupplierId.getValue() != null &&
-                !isEmptyOrNull(txtNewQuantity.getText()) &&
-                !isEmptyOrNull(txtCategory.getText()) &&
-                !isEmptyOrNull(txtPrice.getText());
+                !isEmpty(txtNewQuantity.getText()) &&
+                !isEmpty(txtCategory.getText()) &&
+                !isEmpty(txtPrice.getText());
 
-        boolean hasSelection = !tblInventory.getSelectionModel().isEmpty();
+        boolean hasSelection = tblInventory.getSelectionModel().getSelectedItem() != null;
 
         btnAdd.setDisable(!formValid || hasSelection);
         btnUpdate.setDisable(!formValid || !hasSelection);
         btnDelete.setDisable(!hasSelection);
     }
 
-    private boolean isEmptyOrNull(String text) {
+    private boolean isEmpty(String text) {
         return text == null || text.trim().isEmpty();
-    }
-
-    private void addTextValidations() {
-        txtQuantityAdjustment.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.matches("\\d*")) {
-                txtQuantityAdjustment.setText(oldVal != null ? oldVal : "");
-            }
-        });
-
-        txtPrice.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.matches("\\d*(\\.\\d*)?")) {
-                txtPrice.setText(oldVal != null ? oldVal : "");
-            }
-        });
     }
 
     @FXML
     void btnAddInventory(ActionEvent event) {
         try {
-            InventoryDto dto = getInventoryDtoFromForm();
-            boolean isSaved = inventoryModel.addInventory(dto);
+            if (!validateForm()) return;
 
+            InventoryDto dto = getInventoryDto();
+            boolean isSaved = InventoryModel.saveInventory(dto);
             if (isSaved) {
-                showDetailedAlert(Alert.AlertType.INFORMATION, "Success",
-                        "Inventory Added", "Inventory item added successfully!");
-                clearForm();
+                showAlert("Inventory added successfully", Alert.AlertType.INFORMATION);
+                clearFields();
+                generateNextInventoryId();
                 loadAllInventory();
             }
         } catch (SQLException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Error adding inventory", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Input Error",
-                    "Invalid data", e.getMessage());
+            showAlert("Failed to save inventory: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
+
+
+
 
     @FXML
     void btnUpdateInventory(ActionEvent event) {
         try {
-            if (tblInventory.getSelectionModel().isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please select an item from the table to update");
+            InventoryTm selectedItem = tblInventory.getSelectionModel().getSelectedItem();
+            if (selectedItem == null) {
+                showAlert("Please select an item to update", Alert.AlertType.WARNING);
                 return;
             }
 
-            if (isEmptyOrNull(txtQuantityAdjustment.getText())) {
-                showAlert(Alert.AlertType.WARNING, "Please enter a quantity adjustment value");
-                return;
-            }
-
-            InventoryDto selectedItem = tblInventory.getSelectionModel().getSelectedItem();
-            String operation = cmbQuantityOperation.getValue();
-            int adjustment = Integer.parseInt(txtQuantityAdjustment.getText());
-            int currentQty = selectedItem.getStockQty();
-
-            // Create updated DTO with all fields
-            InventoryDto updatedDto = new InventoryDto(
-                    selectedItem.getInvId(),
-                    cmbSupplierId.getValue(),
-                    txtSupplierName.getText(),
-                    adjustment,
-                    LocalDate.now(),
-                    txtCategory.getText(),
-                    Double.parseDouble(txtPrice.getText())
-            );
-
-            // Calculate new quantity for confirmation message
-            int newQty = calculateNewQuantity(operation, currentQty, adjustment);
-            if (newQty < 0) {
-                showAlert(Alert.AlertType.WARNING, "Cannot have negative quantity!");
-                return;
-            }
+            if (!validateForm()) return;
 
             Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
             confirmation.setTitle("Confirm Update");
             confirmation.setHeaderText("Update Inventory Item");
-            confirmation.setContentText(String.format(
-                    "Operation: %s %d\nCurrent Qty: %d → New Qty: %d\n\nConfirm update?",
-                    operation, adjustment, currentQty, newQty
-            ));
+            confirmation.setContentText("Are you sure you want to update this inventory item?");
 
             Optional<ButtonType> result = confirmation.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.YES) {
-                boolean isUpdated;
-
-                if (operation.equals("Set")) {
-                    updatedDto.setStockQty(adjustment);
-                    isUpdated = inventoryModel.updateInventory(updatedDto);
-                } else {
-                    isUpdated = inventoryModel.updateInventoryWithStockChange(
-                            updatedDto,
-                            operation.equals("Add")
-                    );
-                }
-
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                InventoryDto dto = getInventoryDto();
+                boolean isUpdated = InventoryModel.updateInventory(dto);
                 if (isUpdated) {
-                    showDetailedAlert(Alert.AlertType.INFORMATION, "Success",
-                            "Inventory Updated", "Inventory item updated successfully!");
-                    clearForm();
+                    showAlert("Inventory updated successfully", Alert.AlertType.INFORMATION);
+                    clearFields();
+                    generateNextInventoryId();
                     loadAllInventory();
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Update failed!");
                 }
             }
         } catch (SQLException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Error updating inventory", e.getMessage());
-        } catch (NumberFormatException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Input Error",
-                    "Invalid numeric values", "Please check your input values");
-        }
-    }
-
-    private int calculateNewQuantity(String operation, int currentQty, int adjustment) {
-        switch (operation) {
-            case "Add":
-                return currentQty + adjustment;
-            case "Subtract":
-                return currentQty - adjustment;
-            case "Set":
-                return adjustment;
-            default:
-                return currentQty;
+            showAlert("Failed to update inventory: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     void btnDeleteInventory(ActionEvent event) {
-        try {
-            if (tblInventory.getSelectionModel().isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please select an item from the table to delete");
-                return;
-            }
+        InventoryTm selectedItem = tblInventory.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            showAlert("Please select an item to delete", Alert.AlertType.WARNING);
+            return;
+        }
 
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
-                    "Are you sure you want to delete this inventory item?\nThis action cannot be undone.",
-                    ButtonType.YES, ButtonType.NO);
-            Optional<ButtonType> result = confirmation.showAndWait();
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Delete");
+        confirmation.setHeaderText("Delete Inventory Item");
+        confirmation.setContentText("Are you sure you want to delete this inventory item?");
 
-            if (result.isPresent() && result.get() == ButtonType.YES) {
-                int id = Integer.parseInt(txtInventoryId.getText());
-                boolean isDeleted = inventoryModel.deleteInventory(id);
-
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean isDeleted = InventoryModel.deleteInventory(selectedItem.getInvId());
                 if (isDeleted) {
-                    showDetailedAlert(Alert.AlertType.INFORMATION, "Success",
-                            "Inventory Deleted", "Inventory item deleted successfully!");
-                    clearForm();
+                    showAlert("Inventory deleted successfully", Alert.AlertType.INFORMATION);
+                    clearFields();
+                    generateNextInventoryId();
                     loadAllInventory();
                 }
+            } catch (SQLException e) {
+                showAlert("Failed to delete inventory: " + e.getMessage(), Alert.AlertType.ERROR);
             }
-        } catch (SQLException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Error deleting inventory", e.getMessage());
-        } catch (NumberFormatException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Input Error",
-                    "Invalid inventory ID", "Please select a valid inventory item");
         }
     }
 
     @FXML
     void btnSearchInventory(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Search Inventory");
-        dialog.setHeaderText("Enter Inventory ID");
-        dialog.setContentText("ID:");
+        String invId = txtInventoryId.getText();
+        if (isEmpty(invId)) {
+            showAlert("Please enter an inventory ID", Alert.AlertType.ERROR);
+            return;
+        }
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(idText -> {
-            try {
-                int id = Integer.parseInt(idText);
-                InventoryDto dto = inventoryModel.searchInventory(id);
-
-                if (dto != null) {
-                    fillFormWithInventory(dto);
-                    selectMatchingTableRow(dto);
-                } else {
-                    showAlert(Alert.AlertType.WARNING, "No inventory found with ID: " + id);
-                }
-            } catch (NumberFormatException e) {
-                showDetailedAlert(Alert.AlertType.ERROR, "Input Error",
-                        "Invalid ID", "Please enter a valid numeric ID");
-            } catch (SQLException e) {
-                showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                        "Search error", e.getMessage());
+        try {
+            InventoryDto dto = InventoryModel.searchInventory(invId);
+            if (dto != null) {
+                setFields(dto);
+                selectTableRow(dto);
+            } else {
+                showAlert("Inventory not found", Alert.AlertType.INFORMATION);
             }
-        });
+        } catch (SQLException e) {
+            showAlert(e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+
+    @FXML
+    void btnSearchAnyField(ActionEvent event) {
+        String searchText = txtSearch.getText();
+        if (isEmpty(searchText)) {
+            showAlert("Please enter a search term", Alert.AlertType.ERROR);
+            return;
+        }
+
+        try {
+            List<InventoryDto> inventoryList = InventoryModel.searchInventoryByAnyField(searchText);
+            if (inventoryList.isEmpty()) {
+                showAlert("No matching records found", Alert.AlertType.INFORMATION);
+            } else {
+                populateTable(inventoryList);
+            }
+        } catch (SQLException e) {
+            showAlert(e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
     void btnClearForm(ActionEvent event) {
-        clearForm();
+        clearFields();
+        generateNextInventoryId();
     }
 
     @FXML
@@ -408,125 +331,182 @@ public class InventoryController {
     }
 
     @FXML
-    void btnSearchAnyField(ActionEvent event) {
-        String searchText = txtSearch.getText();
-        if (isEmptyOrNull(searchText)) {
-            showAlert(Alert.AlertType.WARNING, "Please enter search criteria");
-            return;
-        }
-
-        try {
-            List<InventoryDto> results = inventoryModel.searchInventoryByAnyField(searchText.trim());
-            if (results.isEmpty()) {
-                showAlert(Alert.AlertType.INFORMATION, "No matching inventory found");
-            } else {
-                tblInventory.setItems(FXCollections.observableArrayList(results));
-            }
-        } catch (SQLException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Search error", e.getMessage());
-        }
-    }
-
-    @FXML
-    void btnClearSearch(ActionEvent event) {
+    void btnclearField(ActionEvent event) {
         txtSearch.clear();
         loadAllInventory();
     }
 
-    private InventoryDto getInventoryDtoFromForm() throws IllegalArgumentException {
-        try {
-            return new InventoryDto(
-                    Integer.parseInt(txtInventoryId.getText()),
-                    cmbSupplierId.getValue(),
-                    txtSupplierName.getText(),
-                    Integer.parseInt(txtNewQuantity.getText()),
-                    dpLastUpdate.getValue(),
-                    txtCategory.getText(),
-                    Double.parseDouble(txtPrice.getText())
-            );
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid numeric values in form");
-        }
+    private void setFields(InventoryTm tm) {
+        txtInventoryId.setText(tm.getInvId());
+        cmbSupplierId.setValue(tm.getSupId());
+        txtSupplierName.setText(tm.getSupplierName());
+        txtCurrentQuantity.setText(String.valueOf(tm.getStockQty()));
+        txtNewQuantity.setText(String.valueOf(tm.getStockQty()));
+        dpLastUpdate.setValue(tm.getLastUpdate());
+        txtCategory.setText(tm.getCategory());
+        txtPrice.setText(String.valueOf(tm.getPrice()));
     }
 
-    private void fillFormWithInventory(InventoryDto dto) {
+    private void setFields(InventoryDto dto) {
         txtInventoryId.setText(String.valueOf(dto.getInvId()));
-        cmbSupplierId.setValue(dto.getSupId());
+        cmbSupplierId.setValue(String.valueOf(dto.getSupId()));
         txtSupplierName.setText(dto.getSupplierName());
         txtCurrentQuantity.setText(String.valueOf(dto.getStockQty()));
-        txtQuantityAdjustment.clear();
-        txtNewQuantity.clear();
+        txtNewQuantity.setText(String.valueOf(dto.getStockQty()));
         dpLastUpdate.setValue(dto.getLastUpdate());
         txtCategory.setText(dto.getCategory());
         txtPrice.setText(String.valueOf(dto.getPrice()));
-        cmbQuantityOperation.getSelectionModel().selectFirst();
     }
 
-    private void clearForm() {
-        generateNewInventoryId();
+    private void clearFields() {
+        txtInventoryId.clear();
         cmbSupplierId.getSelectionModel().clearSelection();
         txtSupplierName.clear();
         txtCurrentQuantity.clear();
-        txtQuantityAdjustment.clear();
         txtNewQuantity.clear();
-        dpLastUpdate.setValue(LocalDate.now());
+        txtQuantityAdjustment.clear();
+        cmbQuantityOperation.getSelectionModel().selectFirst();
+        dpLastUpdate.setValue(null);
         txtCategory.clear();
         txtPrice.clear();
-        cmbQuantityOperation.getSelectionModel().selectFirst();
         tblInventory.getSelectionModel().clearSelection();
-        updateButtonStates();
     }
 
     private void loadAllInventory() {
         try {
-            List<InventoryDto> inventoryList = inventoryModel.getAllInventory();
-            ObservableList<InventoryDto> list = FXCollections.observableArrayList(inventoryList);
-            tblInventory.setItems(list);
+            List<InventoryDto> inventoryList = InventoryModel.getAllInventory();
+            populateTable(inventoryList);
         } catch (SQLException e) {
-            showDetailedAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Error loading inventory", e.getMessage());
+            showAlert(e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    private void showAlert(Alert.AlertType type, String message) {
-        new Alert(type, message).show();
+    private void populateTable(List<InventoryDto> inventoryList) {
+        ObservableList<InventoryTm> obList = FXCollections.observableArrayList();
+
+        for (InventoryDto dto : inventoryList) {
+            obList.add(new InventoryTm(
+                    String.valueOf(dto.getInvId()),
+                    String.valueOf(dto.getSupId()),
+                    dto.getSupplierName(),
+                    dto.getStockQty(),
+                    dto.getLastUpdate(),
+                    dto.getCategory(),
+                    dto.getPrice(),
+                    new Button("Delete")
+            ));
+        }
+
+        tblInventory.setItems(obList);
     }
 
-    private void showDetailedAlert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void showAlert(String message, Alert.AlertType alertType) {
+        new Alert(alertType, message).show();
     }
 
-    private void setupTableSelectionListener() {
-        tblInventory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                fillFormWithInventory(newSelection);
-            }
-            updateButtonStates();
-        });
+    private void updateButtonStates() {
+        boolean isFormValid = isFormValid();
+        boolean hasTableSelection = tblInventory.getSelectionModel().getSelectedItem() != null;
+
+        // Enable/disable buttons based on form state and selection
+        btnAdd.setDisable(!isFormValid || hasTableSelection);
+        btnUpdate.setDisable(!isFormValid || !hasTableSelection);
+        btnDelete.setDisable(!hasTableSelection);
+        btnClear.setDisable(!isFormValid && !hasTableSelection);
+
+        // Search buttons are always enabled
+        btnSearch.setDisable(false);
+        btnSearchAnyField.setDisable(false);
+        btnLoadAll.setDisable(false);
     }
 
-    private void selectMatchingTableRow(InventoryDto dto) {
+    private boolean isFormValid() {
+        // Check all required fields are filled and valid
+        return cmbSupplierId.getValue() != null &&
+                !txtNewQuantity.getText().isEmpty() &&
+                !txtCategory.getText().isEmpty() &&
+                !txtPrice.getText().isEmpty() &&
+                isValidNumber(txtNewQuantity.getText()) &&
+                isValidDecimal(txtPrice.getText());
+    }
+
+    private boolean isValidNumber(String text) {
+        try {
+            Integer.parseInt(text);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isValidDecimal(String text) {
+        try {
+            Double.parseDouble(text);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean validateForm() {
+        // Validate supplier selection
+        if (cmbSupplierId.getValue() == null || cmbSupplierId.getValue().isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Please select a supplier").show();
+            return false;
+        }
+
+        // Validate quantity
+        if (txtNewQuantity.getText().isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Please enter a quantity").show();
+            return false;
+        }
+        try {
+            Integer.parseInt(txtNewQuantity.getText());
+        } catch (NumberFormatException e) {
+            new Alert(Alert.AlertType.WARNING, "Quantity must be a valid number").show();
+            return false;
+        }
+
+        // Validate category
+        if (txtCategory.getText().isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Please enter a category").show();
+            return false;
+        }
+
+        // Validate price
+        if (txtPrice.getText().isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Please enter a price").show();
+            return false;
+        }
+        try {
+            Double.parseDouble(txtPrice.getText());
+        } catch (NumberFormatException e) {
+            new Alert(Alert.AlertType.WARNING, "Price must be a valid number").show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private InventoryDto getInventoryDto() {
+        return new InventoryDto(
+                Integer.parseInt(txtInventoryId.getText()),
+                Integer.parseInt(cmbSupplierId.getValue()),
+                txtSupplierName.getText(),
+                Integer.parseInt(txtNewQuantity.getText()),
+                dpLastUpdate.getValue() != null ? dpLastUpdate.getValue() : LocalDate.now(),
+                txtCategory.getText(),
+                Double.parseDouble(txtPrice.getText())
+        );
+    }
+
+    private void selectTableRow(InventoryDto dto) {
         tblInventory.getItems().stream()
-                .filter(item -> item.getInvId() == dto.getInvId())
+                .filter(item -> item.getInvId().equals(String.valueOf(dto.getInvId())))
                 .findFirst()
-                .ifPresent(match -> {
-                    tblInventory.getSelectionModel().select(match);
-                    tblInventory.scrollTo(match);
+                .ifPresent(item -> {
+                    tblInventory.getSelectionModel().select(item);
+                    tblInventory.scrollTo(item);
                 });
-    }
-
-    public void refreshInventoryOnTabFocus() {
-        loadAllInventory();
-        clearForm();
-    }
-
-    @FXML
-    void btnclearField(ActionEvent actionEvent) {
-        clearForm();
     }
 }

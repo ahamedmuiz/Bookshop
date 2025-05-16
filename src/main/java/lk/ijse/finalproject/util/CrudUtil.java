@@ -1,27 +1,50 @@
 package lk.ijse.finalproject.util;
 
 import lk.ijse.finalproject.db.DBConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CrudUtil {
-    public static <T> T execute(String sql, Object... obj) throws SQLException {
+    public static <T> T execute(String sql, Object... params) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
-        PreparedStatement pst = connection.prepareStatement(sql);
+        PreparedStatement pstm = connection.prepareStatement(sql);
 
-        for (int i = 0; i < obj.length; i++) {
-            pst.setObject(i + 1, obj[i]);
+        for (int i = 0; i < params.length; i++) {
+            pstm.setObject(i + 1, params[i]);
         }
 
-        if (sql.startsWith("select") || sql.startsWith("SELECT")) {
-            ResultSet resultSet = pst.executeQuery();
-            return (T) resultSet;
-        } else {
-            int i = pst.executeUpdate();
-            boolean isSuccess = i > 0;
-            return (T) (Boolean) isSuccess;
+        if (sql.trim().toUpperCase().startsWith("SELECT")) {
+            return (T) pstm.executeQuery();
         }
+        return (T) (Boolean) (pstm.executeUpdate() > 0);
+    }
+
+    public static <T> List<T> executeAndGetList(String sql, Class<T> type, Object... params) throws SQLException {
+        ResultSet rs = execute(sql, params);
+        List<T> list = new ArrayList<>();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        while (rs.next()) {
+            try {
+                T instance = type.getDeclaredConstructor().newInstance();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object value = rs.getObject(i);
+                    type.getMethod("set" + capitalize(columnName), value.getClass())
+                            .invoke(instance, value);
+                }
+                list.add(instance);
+            } catch (Exception e) {
+                throw new SQLException("Failed to map result set to object", e);
+            }
+        }
+        return list;
+    }
+
+    private static String capitalize(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

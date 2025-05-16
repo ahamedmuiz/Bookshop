@@ -1,189 +1,122 @@
 package lk.ijse.finalproject.model;
 
-import lk.ijse.finalproject.db.DBConnection;
 import lk.ijse.finalproject.dto.InventoryDto;
+import lk.ijse.finalproject.util.CrudUtil;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryModel {
-    public int generateNextInventoryId() throws SQLException {
-        String sql = "SELECT MAX(Inv_ID) FROM Inventory";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement pstm = conn.prepareStatement(sql);
-             ResultSet resultSet = pstm.executeQuery()) {
-
-            if (resultSet.next()) {
-                int maxId = resultSet.getInt(1);
-                return maxId + 1;
-            }
-            return 1;
-        }
+    public static boolean saveInventory(InventoryDto dto) throws SQLException {
+        String sql = "INSERT INTO Inventory(Inv_ID, Sup_ID, Stock_Qty, Last_Update, Category, Price) VALUES(?, ?, ?, ?, ?, ?)";
+        return CrudUtil.execute(sql, dto.getInvId(), dto.getSupId(), dto.getStockQty(), dto.getLastUpdate(), dto.getCategory(), dto.getPrice());
     }
 
-    public boolean addInventory(InventoryDto dto) throws SQLException {
-        String sql = "INSERT INTO Inventory (Inv_ID, Sup_ID, Stock_Qty, Last_Update, Category, Price) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, dto.getInvId());
-            stmt.setInt(2, dto.getSupId());
-            stmt.setInt(3, dto.getStockQty());
-            stmt.setDate(4, Date.valueOf(dto.getLastUpdate()));
-            stmt.setString(5, dto.getCategory());
-            stmt.setDouble(6, dto.getPrice());
-            return stmt.executeUpdate() > 0;
-        }
-    }
-
-    public boolean updateInventory(InventoryDto dto) throws SQLException {
+    public static boolean updateInventory(InventoryDto dto) throws SQLException {
         String sql = "UPDATE Inventory SET Sup_ID = ?, Stock_Qty = ?, Last_Update = ?, Category = ?, Price = ? WHERE Inv_ID = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, dto.getSupId());
-            stmt.setInt(2, dto.getStockQty());
-            stmt.setDate(3, Date.valueOf(dto.getLastUpdate()));
-            stmt.setString(4, dto.getCategory());
-            stmt.setDouble(5, dto.getPrice());
-            stmt.setInt(6, dto.getInvId());
-            return stmt.executeUpdate() > 0;
-        }
+        return CrudUtil.execute(sql, dto.getSupId(), dto.getStockQty(), dto.getLastUpdate(), dto.getCategory(), dto.getPrice(), dto.getInvId());
     }
 
-    public boolean deleteInventory(int id) throws SQLException {
+    public static boolean deleteInventory(String invId) throws SQLException {
         String sql = "DELETE FROM Inventory WHERE Inv_ID = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
-        }
+        return CrudUtil.execute(sql, invId);
     }
 
-    public InventoryDto searchInventory(int id) throws SQLException {
-        String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID WHERE i.Inv_ID = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    public static InventoryDto searchInventory(String invId) throws SQLException {
+        String sql = "SELECT * FROM Inventory WHERE Inv_ID = ?";
+        ResultSet resultSet = CrudUtil.execute(sql, invId);
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new InventoryDto(
-                        rs.getInt("Inv_ID"),
-                        rs.getInt("Sup_ID"),
-                        rs.getString("SupplierName"),
-                        rs.getInt("Stock_Qty"),
-                        rs.getDate("Last_Update").toLocalDate(),
-                        rs.getString("Category"),
-                        rs.getDouble("Price")
-                );
-            }
-            return null;
+        if (resultSet.next()) {
+            return new InventoryDto(
+                    resultSet.getInt("Inv_ID"),
+                    resultSet.getInt("Sup_ID"),
+                    null, // Supplier name will be set separately
+                    resultSet.getInt("Stock_Qty"),
+                    resultSet.getDate("Last_Update").toLocalDate(),
+                    resultSet.getString("Category"),
+                    resultSet.getDouble("Price")
+            );
         }
+        return null;
     }
 
-    public List<InventoryDto> getAllInventory() throws SQLException {
+    public static List<InventoryDto> getAllInventory() throws SQLException {
         String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        ResultSet resultSet = CrudUtil.execute(sql);
 
-            ResultSet rs = stmt.executeQuery();
-            List<InventoryDto> inventoryList = new ArrayList<>();
-
-            while (rs.next()) {
-                inventoryList.add(new InventoryDto(
-                        rs.getInt("Inv_ID"),
-                        rs.getInt("Sup_ID"),
-                        rs.getString("SupplierName"),
-                        rs.getInt("Stock_Qty"),
-                        rs.getDate("Last_Update").toLocalDate(),
-                        rs.getString("Category"),
-                        rs.getDouble("Price")
-                ));
-            }
-            return inventoryList;
+        List<InventoryDto> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(new InventoryDto(
+                    resultSet.getInt("Inv_ID"),
+                    resultSet.getInt("Sup_ID"),
+                    resultSet.getString("SupplierName"),
+                    resultSet.getInt("Stock_Qty"),
+                    resultSet.getDate("Last_Update").toLocalDate(),
+                    resultSet.getString("Category"),
+                    resultSet.getDouble("Price")
+            ));
         }
+        return list;
     }
 
-    public List<InventoryDto> getInventoryBySupplierId(int supId) throws SQLException {
-        String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID WHERE i.Sup_ID = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement pstm = conn.prepareStatement(sql)) {
-            pstm.setInt(1, supId);
-            ResultSet rs = pstm.executeQuery();
+    public static List<InventoryDto> searchInventoryByAnyField(String searchText) throws SQLException {
+        String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID " +
+                "WHERE i.Inv_ID LIKE ? OR i.Category LIKE ? OR s.Name LIKE ?";
+        searchText = "%" + searchText + "%";
+        ResultSet resultSet = CrudUtil.execute(sql, searchText, searchText, searchText);
 
-            List<InventoryDto> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(new InventoryDto(
-                        rs.getInt("Inv_ID"),
-                        rs.getInt("Sup_ID"),
-                        rs.getString("SupplierName"),
-                        rs.getInt("Stock_Qty"),
-                        rs.getDate("Last_Update").toLocalDate(),
-                        rs.getString("Category"),
-                        rs.getDouble("Price")
-                ));
-            }
-            return list;
+        List<InventoryDto> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(new InventoryDto(
+                    resultSet.getInt("Inv_ID"),
+                    resultSet.getInt("Sup_ID"),
+                    resultSet.getString("SupplierName"),
+                    resultSet.getInt("Stock_Qty"),
+                    resultSet.getDate("Last_Update").toLocalDate(),
+                    resultSet.getString("Category"),
+                    resultSet.getDouble("Price")
+            ));
         }
+        return list;
     }
 
-    public List<InventoryDto> searchInventoryByAnyField(String searchText) throws SQLException {
+    public static String generateNextInventoryId() throws SQLException {
+        String sql = "SELECT Inv_ID FROM Inventory ORDER BY Inv_ID DESC LIMIT 1";
+        ResultSet resultSet = CrudUtil.execute(sql);
+
+        if (resultSet.next()) {
+            String lastId = resultSet.getString(1);
+            int lastIdNum = Integer.parseInt(lastId);
+            return String.format("%03d", lastIdNum + 1);
+        }
+        return "001";
+    }
+
+    public static boolean updateInventoryQuantity(String invId, int newQty) throws SQLException {
+        String sql = "UPDATE Inventory SET Stock_Qty = ?, Last_Update = CURRENT_DATE WHERE Inv_ID = ?";
+        return CrudUtil.execute(sql, newQty, invId);
+    }
+
+    public static List<InventoryDto> getInventoryBySupplierId(int supplierId) throws SQLException {
         String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i " +
                 "LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID " +
-                "WHERE i.Inv_ID LIKE ? OR i.Category LIKE ? OR s.Name LIKE ? OR i.Sup_ID LIKE ?";
+                "WHERE i.Sup_ID = ?";
+        ResultSet resultSet = CrudUtil.execute(sql, supplierId);
 
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            String searchPattern = "%" + searchText + "%";
-            stmt.setString(1, searchPattern);
-            stmt.setString(2, searchPattern);
-            stmt.setString(3, searchPattern);
-
-            // Try to parse as integer for Sup_ID search
-            try {
-                stmt.setInt(4, Integer.parseInt(searchText));
-            } catch (NumberFormatException e) {
-                stmt.setInt(4, -1); // Will match nothing if search text isn't a number
-            }
-
-            ResultSet rs = stmt.executeQuery();
-            List<InventoryDto> results = new ArrayList<>();
-
-            while (rs.next()) {
-                results.add(new InventoryDto(
-                        rs.getInt("Inv_ID"),
-                        rs.getInt("Sup_ID"),
-                        rs.getString("SupplierName"),
-                        rs.getInt("Stock_Qty"),
-                        rs.getDate("Last_Update").toLocalDate(),
-                        rs.getString("Category"),
-                        rs.getDouble("Price")
-                ));
-            }
-            return results;
+        List<InventoryDto> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(new InventoryDto(
+                    resultSet.getInt("Inv_ID"),
+                    resultSet.getInt("Sup_ID"),
+                    resultSet.getString("SupplierName"),
+                    resultSet.getInt("Stock_Qty"),
+                    resultSet.getDate("Last_Update").toLocalDate(),
+                    resultSet.getString("Category"),
+                    resultSet.getDouble("Price")
+            ));
         }
-    }
-
-    public boolean updateInventoryWithStockChange(InventoryDto dto, boolean isAddition) throws SQLException {
-        String sql = "UPDATE Inventory SET Sup_ID = ?, Stock_Qty = Stock_Qty " +
-                (isAddition ? "+" : "-") + " ?, Last_Update = ?, Category = ?, Price = ? " +
-                "WHERE Inv_ID = ?";
-
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, dto.getSupId());
-            stmt.setInt(2, dto.getStockQty());
-            stmt.setDate(3, Date.valueOf(dto.getLastUpdate()));
-            stmt.setString(4, dto.getCategory());
-            stmt.setDouble(5, dto.getPrice());
-            stmt.setInt(6, dto.getInvId());
-
-            return stmt.executeUpdate() > 0;
-        }
+        return list;
     }
 }
