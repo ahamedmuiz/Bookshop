@@ -9,7 +9,7 @@ import lombok.*;
 @ToString
 public class OrderBookContainDto {
     private String oId;
-    private String invId;  // Changed from bId to invId
+    private int invId;  // Changed to int to match your Inventory table
     private int qty;
     private double price;
 }

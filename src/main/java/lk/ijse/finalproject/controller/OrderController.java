@@ -15,20 +15,22 @@ import lk.ijse.finalproject.model.BookModel;
 import lk.ijse.finalproject.model.CustomerModel;
 import lk.ijse.finalproject.model.InventoryModel;
 import lk.ijse.finalproject.model.OrderModel;
+import lk.ijse.finalproject.util.PaymentDialog;
 
 import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class OrderController implements Initializable {
 
     @FXML private ComboBox<String> cmbCustomerId;
-    @FXML private ComboBox<String> cmbItemId;
+    @FXML private ComboBox<Integer> cmbItemId;  // Changed to Integer type
     @FXML private TableView<CartTm> tblCart;
-    @FXML private TableColumn<CartTm, String> colItemId;
+    @FXML private TableColumn<CartTm, Integer> colItemId;  // Changed to Integer type
     @FXML private TableColumn<CartTm, String> colItemName;
     @FXML private TableColumn<CartTm, Double> colUnitPrice;
     @FXML private TableColumn<CartTm, Integer> colQuantity;
@@ -58,8 +60,8 @@ public class OrderController implements Initializable {
     }
 
     private void initializeTableColumns() {
-        colItemId.setCellValueFactory(new PropertyValueFactory<>("invId"));  // Changed from "bId" to "invId"
-        colItemName.setCellValueFactory(new PropertyValueFactory<>("category"));  // Changed from "name" to "category"
+        colItemId.setCellValueFactory(new PropertyValueFactory<>("invId"));
+        colItemName.setCellValueFactory(new PropertyValueFactory<>("category"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("qty"));
         colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
@@ -67,7 +69,7 @@ public class OrderController implements Initializable {
     }
 
     private void resetPage() throws SQLException {
-        lblOrderId.setText(String.valueOf(orderModel.getNextOrderId())); // Convert int to String
+        lblOrderId.setText(String.valueOf(orderModel.getNextOrderId()));
         lblOrderDate.setText(LocalDate.now().toString());
         loadCustomerIds();
         loadInventoryIds();
@@ -75,7 +77,9 @@ public class OrderController implements Initializable {
     }
 
     private void loadInventoryIds() throws SQLException {
-        cmbItemId.setItems(FXCollections.observableArrayList(bookModel.getAllBookIds()));  // Changed method name
+        // Assuming bookModel.getAllBookIds() now returns List<Integer>
+        List<Integer> inventoryIds = bookModel.getAllBookIds();
+        cmbItemId.setItems(FXCollections.observableArrayList(inventoryIds));
     }
 
     private void loadCustomerIds() throws SQLException {
@@ -92,9 +96,9 @@ public class OrderController implements Initializable {
 
     @FXML
     void cmbItemOnAction(ActionEvent event) throws SQLException {
-        String invId = cmbItemId.getValue();
+        Integer invId = cmbItemId.getValue();  // Now using Integer
         if (invId != null) {
-            BookDto inventoryItem = bookModel.findById(invId);  // Still using BookDto but for inventory
+            BookDto inventoryItem = bookModel.findById(invId);  // Updated to use int
             if (inventoryItem != null) {
                 lblItemName.setText(inventoryItem.getCategory());
                 lblItemQty.setText(String.valueOf(inventoryItem.getQty()));
@@ -105,7 +109,7 @@ public class OrderController implements Initializable {
 
     @FXML
     void btnAddToCartOnAction(ActionEvent event) {
-        String selectedInvId = cmbItemId.getValue();
+        Integer selectedInvId = cmbItemId.getValue();  // Now using Integer
         String cartQtyString = txtAddToCartQty.getText();
 
         if (!validateCartAddition(selectedInvId, cartQtyString)) return;
@@ -114,47 +118,54 @@ public class OrderController implements Initializable {
         double unitPrice = Double.parseDouble(lblItemPrice.getText());
         double total = unitPrice * cartQty;
 
-        // Check if item is already in the cart
-        CartTm existingItem = null;
-        for (CartTm item : cartData) {
-            if (item.getInvId().equals(selectedInvId)) {
-                existingItem = item;
-                break;
-            }
-        }
+        CartTm existingItem = findCartItem(selectedInvId);
 
         if (existingItem != null) {
-            // Calculate total quantity and validate against stock
-            int newQuantity = existingItem.getQty() + cartQty;
-            int stockQty = Integer.parseInt(lblItemQty.getText());
-
-            if (newQuantity > stockQty) {
-                showAlert(Alert.AlertType.WARNING, "Cannot add more than the available stock!");
-                return;
-            }
-
-            existingItem.setQty(newQuantity);
-            existingItem.setTotal(existingItem.getPrice() * newQuantity);
-            tblCart.refresh();
+            updateExistingCartItem(existingItem, cartQty);
         } else {
-            // New item to be added
-            Button removeBtn = new Button("Remove");
-            CartTm cartTm = new CartTm(selectedInvId, lblItemName.getText(), cartQty, unitPrice, total, removeBtn);
-
-            removeBtn.setOnAction(e -> {
-                cartData.remove(cartTm);
-                calculateTotal();
-            });
-
-            cartData.add(cartTm);
+            addNewCartItem(String.valueOf(selectedInvId), cartQty, unitPrice, total);
         }
 
         calculateTotal();
         txtAddToCartQty.clear();
     }
 
+    private CartTm findCartItem(Integer invId) {
+        for (CartTm item : cartData) {
+            if (item.getInvId().equals(invId)) {
+                return item;
+            }
+        }
+        return null;
+    }
 
-    private boolean validateCartAddition(String selectedInvId, String cartQtyString) {
+    private void updateExistingCartItem(CartTm existingItem, int additionalQty) {
+        int newQuantity = existingItem.getQty() + additionalQty;
+        int stockQty = Integer.parseInt(lblItemQty.getText());
+
+        if (newQuantity > stockQty) {
+            showAlert(Alert.AlertType.WARNING, "Cannot add more than the available stock!");
+            return;
+        }
+
+        existingItem.setQty(newQuantity);
+        existingItem.setTotal(existingItem.getPrice() * newQuantity);
+        tblCart.refresh();
+    }
+
+    private void addNewCartItem(String invId, int qty, double price, double total) {
+        Button removeBtn = new Button("Remove");
+        CartTm cartTm = new CartTm(invId, lblItemName.getText(), qty, price, total, removeBtn);
+
+        removeBtn.setOnAction(e -> {
+            cartData.remove(cartTm);
+            calculateTotal();
+        });
+
+        cartData.add(cartTm);
+    }
+
+    private boolean validateCartAddition(Integer selectedInvId, String cartQtyString) {
         if (selectedInvId == null) {
             showAlert(Alert.AlertType.WARNING, "Please select an inventory item!");
             return false;
@@ -184,49 +195,63 @@ public class OrderController implements Initializable {
     @FXML
     void btnPlaceOrderOnAction(ActionEvent event) {
         if (tblCart.getItems().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please add items to cart!").show();
+            showAlert(Alert.AlertType.WARNING, "Please add items to cart!");
             return;
         }
 
-        if (cmbCustomerId.getValue() == null || cmbCustomerId.getValue().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please select a customer!").show();
+        if (cmbCustomerId.getValue() == null) {
+            showAlert(Alert.AlertType.WARNING, "Please select a customer!");
             return;
         }
 
-        String customerId = cmbCustomerId.getValue();
+        String paymentMethod = PaymentDialog.showPaymentDialog();
+        if (paymentMethod == null) {
+            showAlert(Alert.AlertType.INFORMATION, "Order cancelled");
+            return;
+        }
+
         String orderId = lblOrderId.getText();
+        String customerId = cmbCustomerId.getValue();
         Date date = Date.valueOf(lblOrderDate.getText());
+        double total = Double.parseDouble(lblTotal.getText());
 
-        ArrayList<OrderBookContainDto> cartList = new ArrayList<>();
-        for (CartTm cartTm : cartData) {
-            cartList.add(new OrderBookContainDto(
-                    orderId,
-                    cartTm.getInvId(),  // Changed from getBId() to getInvId()
-                    cartTm.getQty(),
-                    cartTm.getPrice()
-            ));
-        }
+        ArrayList<OrderBookContainDto> cartList = getOrderDetailsList(orderId);
 
         OrderDto orderDto = new OrderDto(
                 orderId,
                 customerId,
                 date,
+                total,
+                paymentMethod,
                 cartList
         );
 
         try {
             boolean isPlaced = orderModel.placeOrder(orderDto);
             if (isPlaced) {
-                new Alert(Alert.AlertType.CONFIRMATION, "Order placed successfully!").show();
+                showAlert(Alert.AlertType.CONFIRMATION, "Order placed successfully!");
                 resetPage();
                 cartData.clear();
             } else {
-                new Alert(Alert.AlertType.ERROR, "Failed to place order!").show();
+                showAlert(Alert.AlertType.ERROR, "Failed to place order!");
             }
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to place order!").show();
+            showAlert(Alert.AlertType.ERROR, "Error: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private ArrayList<OrderBookContainDto> getOrderDetailsList(String orderId) {
+        ArrayList<OrderBookContainDto> list = new ArrayList<>();
+        for (CartTm tm : cartData) {
+            list.add(new OrderBookContainDto(
+                    orderId,
+                    Integer.parseInt(tm.getInvId()),
+                    tm.getQty(),
+                    tm.getPrice()
+            ));
+        }
+        return list;
     }
 
     @FXML

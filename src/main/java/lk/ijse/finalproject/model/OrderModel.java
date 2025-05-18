@@ -1,12 +1,14 @@
 package lk.ijse.finalproject.model;
 
 import lk.ijse.finalproject.db.DBConnection;
+import lk.ijse.finalproject.dto.OrderBookContainDto;
 import lk.ijse.finalproject.dto.OrderDto;
 import lk.ijse.finalproject.util.CrudUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class OrderModel {
     private final OrderBookContainModel orderBookContainModel = new OrderBookContainModel();
@@ -37,38 +39,47 @@ public class OrderModel {
         try {
             connection.setAutoCommit(false);
 
-            // Calculate the total amount
-            double totalAmount = orderDto.getCartList().stream()
-                    .mapToDouble(dto -> dto.getPrice() * dto.getQty())
-                    .sum();
-
-            // Execute the order insertion with the correct parameters
-            boolean isSaved = CrudUtil.execute(
-                    "INSERT INTO OrderTable (O_ID, C_ID, Date, Total_Amount) VALUES (?, ?, ?, ?)",
-                    orderDto.getOId(),      // Example: "O001"
+            // Save order with payment method
+            boolean isOrderSaved = CrudUtil.execute(
+                    "INSERT INTO OrderTable (O_ID, C_ID, Date, Total_Amount, Payment_Method) VALUES (?, ?, ?, ?, ?)",
+                    orderDto.getOId(),
                     orderDto.getCId(),
                     orderDto.getDate(),
-                    totalAmount
+                    orderDto.getTotalAmount(),
+                    orderDto.getPaymentMethod()
             );
 
-            if (isSaved) {
-                // Save all order details in OrderBookContain
-                boolean isDetailsSaved = orderBookContainModel.saveOrderDetailsList(orderDto.getCartList());
+            if (isOrderSaved) {
+                // Save order items
+                boolean isItemsSaved = orderBookContainModel.saveOrderDetailsList(orderDto.getCartList());
 
-                if (isDetailsSaved) {
-                    connection.commit();  // Commit if everything is successful
-                    return true;
+                if (isItemsSaved) {
+                    // Update inventory
+                    boolean isInventoryUpdated = updateInventory(orderDto.getCartList());
+
+                    if (isInventoryUpdated) {
+                        connection.commit();
+                        return true;
+                    }
                 }
             }
 
-            connection.rollback();  // Rollback if any failure occurs
-            return false;
-        } catch (Exception e) {
-            connection.rollback(); // Ensure rollback on exception
-            e.printStackTrace();
+            connection.rollback();
             return false;
         } finally {
-            connection.setAutoCommit(true);  // Restore auto-commit mode
+            connection.setAutoCommit(true);
         }
+    }
+
+    private boolean updateInventory(ArrayList<OrderBookContainDto> cartList) throws SQLException {
+        for (OrderBookContainDto item : cartList) {
+            boolean updated = CrudUtil.execute(
+                    "UPDATE Inventory SET Stock_Qty = Stock_Qty - ? WHERE Inv_ID = ?",
+                    item.getQty(),
+                    item.getInvId()
+            );
+            if (!updated) return false;
+        }
+        return true;
     }
 }

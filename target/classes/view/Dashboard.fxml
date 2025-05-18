@@ -24,10 +24,10 @@
          <children>
             <Button fx:id="btnInventory" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Inventory" />
             <Button fx:id="btnCustomer" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Customer Details" />
-            <Button fx:id="btnOrders" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Orders" />
+            <Button fx:id="btnOrders" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Order placement" />
             <Button fx:id="btnPayments" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Payments" />
             <Button fx:id="btnDelivery" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Delivery" />
-            <Button fx:id="btnSales" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Sales" />
+            <Button fx:id="btnSales" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Sales Analytics" />
             <Button fx:id="btnEmployees" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Employee Details" />
             <Button fx:id="btnSuppliers" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Suppliers" />
             <Button fx:id="btnAttendance" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Attendance" />

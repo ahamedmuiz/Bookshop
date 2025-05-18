@@ -14,5 +14,7 @@ public class OrderDto {
     private String oId;
     private String cId;
     private Date date;
+    private double totalAmount;
+    private String paymentMethod; // New field
     private ArrayList<OrderBookContainDto> cartList;
 }

@@ -9,16 +9,22 @@ import java.util.ArrayList;
 public class OrderBookContainModel {
     private final BookModel bookModel = new BookModel();
 
-    public boolean saveOrderDetailsList(ArrayList<OrderBookContainDto> cartList) throws SQLException {
-        for (OrderBookContainDto dto : cartList) {
-            boolean isDetailsSaved = saveOrderDetails(dto);
-            if (!isDetailsSaved) return false;
+        public static boolean saveOrderDetailsList(ArrayList<OrderBookContainDto> list) throws SQLException {
+            String sql = "INSERT INTO OrderBookContain (O_ID, Inv_ID, Qty, Unit_Price, Total_Amount) VALUES (?, ?, ?, ?, ?)";
 
-            boolean isUpdated = bookModel.reduceQty(dto);
-            if (!isUpdated) return false;
+            for (OrderBookContainDto dto : list) {
+                boolean isSaved = CrudUtil.execute(sql,
+                        dto.getOId(),
+                        dto.getInvId(),
+                        dto.getQty(),
+                        dto.getPrice(),
+                        dto.getQty() * dto.getPrice()
+                );
+                if (!isSaved) return false;
+            }
+            return true;
         }
-        return true;
-    }
+
 
     private boolean saveOrderDetails(OrderBookContainDto dto) throws SQLException {
         double totalAmount = dto.getPrice() * dto.getQty();

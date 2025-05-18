@@ -1,4 +1,5 @@
 package lk.ijse.finalproject.controller;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -12,7 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -68,13 +68,12 @@ public class DashController {
     @FXML
     private Label timeLabel;
 
-
     private List<Button> buttonList;
 
     @FXML
     public void initialize() {
         // Set current date
-        dateLabel.setText(LocalDate.now().toString());
+        dateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         // Set current time and update every second
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
@@ -93,32 +92,54 @@ public class DashController {
         btnLogout.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white;");
     }
 
-
     @FXML
-    void handleButtonClick(ActionEvent event) throws IOException {
+    void handleButtonClick(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
 
         // If logout clicked popup confirmation box
         if (clickedButton == btnLogout) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Logout Confirmation");
-            alert.setHeaderText("Are you sure you want to logout?");
-            alert.setContentText("Click OK to logout or Cancel to stay.");
+            handleLogout(event);
+            return;
+        }
 
-            Optional<ButtonType> result = alert.showAndWait();
+        // Reset styles
+        resetButtonStyles();
 
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                Parent loginPage = FXMLLoader.load(getClass().getResource("/view/LoginPage.fxml"));
+        // Set clicked button style
+        clickedButton.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        // Load UI based on button clicked
+        try {
+            String fxmlFile = getFxmlPathForButton(clickedButton);
+            loadUI(fxmlFile);
+        } catch (Exception e) {
+            showErrorAlert("Failed to load view: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleLogout(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout Confirmation");
+        alert.setHeaderText("Are you sure you want to logout?");
+        alert.setContentText("Click OK to logout or Cancel to stay.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                Parent loginPage = FXMLLoader.load(getClass().getResource("/lk/ijse/finalproject/view/LoginPage.fxml"));
                 Scene loginScene = new Scene(loginPage);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(loginScene);
                 stage.show();
+            } catch (IOException e) {
+                showErrorAlert("Failed to load login page: " + e.getMessage());
+                e.printStackTrace();
             }
-            return;
         }
+    }
 
-
-        // Reset styles
+    private void resetButtonStyles() {
         for (Button button : buttonList) {
             if (button == btnLogout) {
                 button.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white;");
@@ -126,56 +147,46 @@ public class DashController {
                 button.setStyle("-fx-background-color: #34495E; -fx-text-fill: white;");
             }
         }
-
-        // clicked button become yellow in dashboard
-
-        clickedButton.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;");
-
-        // Load UI
-        if (clickedButton == btnInventory) {
-            loadUI("InventoryPage");
-        }
-        else if (clickedButton == btnCustomer) {
-            loadUI("CustomerPage");
-        }
-        else if (clickedButton == btnOrders) {
-            loadUI("OrderPage");
-        }
-        else if (clickedButton == btnSuppliers) {
-                loadUI("SupplierPage");
-        }
-        else if (clickedButton == btnEmployees) {
-            loadUI("EmployeePage");
-        }
-        else if (clickedButton == btnAttendance) {
-            loadUI("AttendancePage");
-        }
-        else if (clickedButton == btnSalary) {
-            loadUI("SalaryPage");
-        }
-        else if (clickedButton == btnSales) {
-            loadUI("SalePage");
-        }
     }
 
+    private String getFxmlPathForButton(Button button) {
+        if (button == btnInventory) return "InventoryPage";
+        if (button == btnCustomer) return "CustomerPage";
+        if (button == btnOrders) return "OrderPage";
+        if (button == btnSuppliers) return "SupplierPage";
+        if (button == btnEmployees) return "EmployeePage";
+        if (button == btnAttendance) return "AttendancePage";
+        if (button == btnSalary) return "SalaryPage";
+        if (button == btnSales) return "SalePage";
+        if (button == btnPayments) return "PaymentPage";
+        if (button == btnDelivery) return "DeliveryPage";
+        throw new IllegalArgumentException("No FXML mapping for button: " + button.getId());
+    }
 
-    private void loadUI(String InventoryPage) {
-        try {
-            Parent node = FXMLLoader.load(getClass().getResource("/view/" + InventoryPage + ".fxml"));
-            ancMainDashSwitch.getChildren().clear();
-            ancMainDashSwitch.getChildren().add(node);
+    private void loadUI(String fxmlFileName) throws IOException {
+        String fxmlPath = "/view/" + fxmlFileName + ".fxml";
+        System.out.println("Attempting to load: " + fxmlPath); // Debug line
 
-            AnchorPane.setTopAnchor(node, 0.0);
-            AnchorPane.setRightAnchor(node, 0.0);
-            AnchorPane.setBottomAnchor(node, 0.0);
-            AnchorPane.setLeftAnchor(node, 0.0);
-        } catch (IOException e) {
-            e.printStackTrace();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        if (loader.getLocation() == null) {
+            throw new IOException("FXML file not found at: " + fxmlPath);
         }
+
+        Parent node = loader.load();
+        ancMainDashSwitch.getChildren().clear();
+        ancMainDashSwitch.getChildren().add(node);
+
+        AnchorPane.setTopAnchor(node, 0.0);
+        AnchorPane.setRightAnchor(node, 0.0);
+        AnchorPane.setBottomAnchor(node, 0.0);
+        AnchorPane.setLeftAnchor(node, 0.0);
+    }
+
+    private void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("An error occurred");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
-
-
-
-
-

@@ -1,15 +1,16 @@
 package lk.ijse.finalproject.dto.tm;
 
 import javafx.scene.control.Button;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class InventoryTm {
     private String invId;
     private String supId;

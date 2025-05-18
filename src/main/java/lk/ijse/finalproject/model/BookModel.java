@@ -7,18 +7,19 @@ import lk.ijse.finalproject.util.CrudUtil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BookModel {
-    public ArrayList<String> getAllBookIds() throws SQLException {
+    public List<Integer> getAllBookIds() throws SQLException {
         ResultSet rst = CrudUtil.execute("SELECT Inv_ID FROM Inventory");
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<Integer> list = new ArrayList<>();
         while (rst.next()) {
-            list.add(rst.getString(1));
+            list.add(rst.getInt(1));
         }
         return list;
     }
 
-    public BookDto findById(String invId) throws SQLException {
+    public BookDto findById(int invId) throws SQLException {
         ResultSet rst = CrudUtil.execute(
                 "SELECT Inv_ID, Category, Stock_Qty, Price, Sup_ID " +
                         "FROM Inventory WHERE Inv_ID = ?",
