@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class EmployeeDto {
     private int E_ID;
     private String E_Name;
     private String E_Email;
     private String E_Contact;
+    private double hourly_rate;
 }

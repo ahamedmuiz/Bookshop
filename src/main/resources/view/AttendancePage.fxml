@@ -1,136 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.171"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="lk.ijse.finalproject.controller.AttendanceController"
-            style="-fx-background-color: #f5f7fa;"
-            prefHeight="700" prefWidth="1000">
-
+<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.AttendanceController">
     <!-- Main ScrollPane wrapping all content -->
-    <ScrollPane fitToWidth="true"
-                hbarPolicy="NEVER"
-                vbarPolicy="AS_NEEDED"
-                AnchorPane.topAnchor="0"
-                AnchorPane.bottomAnchor="30"
-                AnchorPane.leftAnchor="0"
-                AnchorPane.rightAnchor="0">
-
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
         <!-- Main Content Container -->
-        <VBox fx:id="mainContent" spacing="20"
-              style="-fx-background-color: transparent;"
-              prefWidth="980">
-
+        <VBox fx:id="mainContent" prefWidth="980" spacing="20" style="-fx-background-color: transparent;">
             <!-- Header Section -->
             <HBox alignment="CENTER" style="-fx-background-color: #4e73df; -fx-background-radius: 5;">
-                <Label text="Employee Attendance Management"
-                       style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
+                <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Employee Attendance Management">
                     <padding>
-                        <Insets top="15" right="15" bottom="15" left="15"/>
+                        <Insets bottom="15" left="15" right="15" top="15" />
                     </padding>
                 </Label>
             </HBox>
 
             <!-- Employee Selection Section -->
-            <GridPane hgap="10" vgap="15"
-                      style="-fx-background-color: white; -fx-background-radius: 5;"
-                      prefWidth="980">
+            <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
                 <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
+                    <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
-                <Label text="Select Employee:" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                       style="-fx-font-weight: bold; -fx-text-fill: #4e73df;"/>
-                <ComboBox fx:id="cmbEmployee" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                          prefWidth="350"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Employee:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cmbEmployee" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="Date:" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                       style="-fx-font-weight: bold; -fx-text-fill: #4e73df;"/>
-                <DatePicker fx:id="dpDate" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <DatePicker fx:id="dpDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <HBox spacing="15" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2">
-                    <Button fx:id="btnClockIn" text="Clock In"
-                            style="-fx-background-color: #1cc88a; -fx-text-fill: white; -fx-font-weight: bold;"
-                            prefWidth="100" onAction="#onClockInClicked"/>
-                    <Button fx:id="btnClockOut" text="Clock Out"
-                            style="-fx-background-color: #e74a3b; -fx-text-fill: white; -fx-font-weight: bold;"
-                            prefWidth="100" onAction="#onClockOutClicked"/>
-                    <Button fx:id="btnReset" text="Reset"
-                            style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"
-                            prefWidth="100" onAction="#onResetClicked"/>
+                <HBox spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                    <Button fx:id="btnClockIn" onAction="#onClockInClicked" prefWidth="100" style="-fx-background-color: #1cc88a; -fx-text-fill: white; -fx-font-weight: bold;" text="Clock In" />
+                    <Button fx:id="btnClockOut" onAction="#onClockOutClicked" prefWidth="100" style="-fx-background-color: #e74a3b; -fx-text-fill: white; -fx-font-weight: bold;" text="Clock Out" />
+                    <Button fx:id="btnReset" onAction="#onResetClicked" prefWidth="100" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;" text="Reset" />
                 </HBox>
+
+                <!-- Add this row for total hours display -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Total Hours Today:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label fx:id="lblTotalHours" style="-fx-font-weight: bold;" text="0.00 hours" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <columnConstraints>
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints /> <!-- Added for the new row -->
+                </rowConstraints>
             </GridPane>
 
             <!-- Today's Attendance Records -->
-            <VBox spacing="10"
-                  style="-fx-background-color: white; -fx-background-radius: 5;"
-                  prefWidth="980">
+            <VBox prefWidth="980" spacing="10" style="-fx-background-color: white; -fx-background-radius: 5;">
                 <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
+                    <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
-                <Label text="Today's Attendance Records"
-                       style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;" text="Today's Attendance Records" />
 
                 <TableView fx:id="tblAttendance" prefHeight="150">
                     <columns>
-                        <TableColumn fx:id="colTime" text="Time" prefWidth="175">
-                            <cellValueFactory><PropertyValueFactory property="time"/></cellValueFactory>
+                        <TableColumn fx:id="colTime" prefWidth="175" text="Time">
+                            <cellValueFactory><PropertyValueFactory property="time" /></cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colType" text="Type" prefWidth="175">
-                            <cellValueFactory><PropertyValueFactory property="type"/></cellValueFactory>
+                        <TableColumn fx:id="colType" prefWidth="175" text="Type">
+                            <cellValueFactory><PropertyValueFactory property="type" /></cellValueFactory>
                         </TableColumn>
                     </columns>
                 </TableView>
-
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Label text="Total Hours Worked:"
-                           style="-fx-font-weight: bold; -fx-text-fill: #5a5c69;"/>
-                    <Label fx:id="lblTotalHours" text="0 hours"
-                           style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 14px;"/>
-                </HBox>
             </VBox>
 
             <!-- Attendance History Section -->
-            <VBox fx:id="historyContainer" spacing="10"
-                  style="-fx-background-color: white; -fx-background-radius: 5;"
-                  prefWidth="980">
+            <VBox fx:id="historyContainer" prefWidth="980" spacing="10" style="-fx-background-color: white; -fx-background-radius: 5;">
                 <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
+                    <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
-                <Label text="Attendance History"
-                       style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;" text="Attendance History" />
 
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label text="Filter by Date Range:"
-                           style="-fx-font-weight: bold; -fx-text-fill: #5a5c69;"/>
-                    <DatePicker fx:id="dpStartDate"/>
-                    <Label text="to"/>
-                    <DatePicker fx:id="dpEndDate"/>
-                    <Button text="Search"
-                            style="-fx-background-color: #4e73df; -fx-text-fill: white; -fx-font-weight: bold;"
-                            onAction="#onSearchClicked"/>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: #5a5c69;" text="Filter by Date Range:" />
+                    <DatePicker fx:id="dpStartDate" />
+                    <Label text="to" />
+                    <DatePicker fx:id="dpEndDate" />
+                    <Button onAction="#onSearchClicked" style="-fx-background-color: #4e73df; -fx-text-fill: white; -fx-font-weight: bold;" text="Search" />
                 </HBox>
 
                 <TableView fx:id="tblAttendanceHistory" prefHeight="250">
                     <columns>
-                        <TableColumn fx:id="colDate" text="Date" prefWidth="200">
-                            <cellValueFactory><PropertyValueFactory property="date"/></cellValueFactory>
+                        <TableColumn fx:id="colDate" prefWidth="200" text="Date">
+                            <cellValueFactory><PropertyValueFactory property="date" /></cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colFirstIn" text="First In" prefWidth="200">
-                            <cellValueFactory><PropertyValueFactory property="firstIn"/></cellValueFactory>
+                        <TableColumn fx:id="colFirstIn" prefWidth="200" text="First In">
+                            <cellValueFactory><PropertyValueFactory property="firstIn" /></cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colLastOut" text="Last Out" prefWidth="200">
-                            <cellValueFactory><PropertyValueFactory property="lastOut"/></cellValueFactory>
+                        <TableColumn fx:id="colLastOut" prefWidth="200" text="Last Out">
+                            <cellValueFactory><PropertyValueFactory property="lastOut" /></cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colTotalHoursWorked" text="Total Hours" prefWidth="200">
-                            <cellValueFactory><PropertyValueFactory property="totalHours"/></cellValueFactory>
+                        <TableColumn fx:id="colTotalHoursWorked" prefWidth="200" text="Total Hours">
+                            <cellValueFactory><PropertyValueFactory property="totalHours" /></cellValueFactory>
                         </TableColumn>
                     </columns>
                 </TableView>
@@ -139,9 +122,7 @@
     </ScrollPane>
 
     <!-- Status Bar (fixed at bottom) -->
-    <HBox style="-fx-background-color: #4e73df; -fx-padding: 5;"
-          alignment="CENTER_LEFT"
-          AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-        <Label fx:id="lblStatus" text="Ready" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #4e73df; -fx-padding: 5;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <Label fx:id="lblStatus" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Ready" />
     </HBox>
 </AnchorPane>

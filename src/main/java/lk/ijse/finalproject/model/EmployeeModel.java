@@ -11,13 +11,14 @@ public class EmployeeModel {
 
 
     public static boolean addEmployee(EmployeeDto employee) throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO Employee (E_ID, E_Name, E_Email, E_Contact) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Employee (E_ID, E_Name, E_Email, E_Contact, hourly_rate) VALUES (?, ?, ?, ?, ?)";
         Connection con = DBConnection.getInstance().getConnection();
         PreparedStatement pstm = con.prepareStatement(sql);
         pstm.setInt(1, employee.getE_ID());
         pstm.setString(2, employee.getE_Name());
         pstm.setString(3, employee.getE_Email());
         pstm.setString(4, employee.getE_Contact());
+        pstm.setDouble(5, employee.getHourly_rate());
         return pstm.executeUpdate() > 0;
     }
 
@@ -30,13 +31,14 @@ public class EmployeeModel {
     }
 
     public static boolean updateEmployee(EmployeeDto employee) throws SQLException, ClassNotFoundException {
-        String sql = "UPDATE Employee SET E_Name = ?, E_Email = ?, E_Contact = ? WHERE E_ID = ?";
+        String sql = "UPDATE Employee SET E_Name = ?, E_Email = ?, E_Contact = ?, hourly_rate = ? WHERE E_ID = ?";
         Connection con = DBConnection.getInstance().getConnection();
         PreparedStatement pstm = con.prepareStatement(sql);
         pstm.setString(1, employee.getE_Name());
         pstm.setString(2, employee.getE_Email());
         pstm.setString(3, employee.getE_Contact());
-        pstm.setInt(4, employee.getE_ID());
+        pstm.setDouble(4, employee.getHourly_rate());
+        pstm.setInt(5, employee.getE_ID());
         return pstm.executeUpdate() > 0;
     }
 
@@ -52,7 +54,8 @@ public class EmployeeModel {
                     rs.getInt("E_ID"),
                     rs.getString("E_Name"),
                     rs.getString("E_Email"),
-                    rs.getString("E_Contact")
+                    rs.getString("E_Contact"),
+                    rs.getDouble("hourly_rate")
             );
         }
         return null;
@@ -70,7 +73,8 @@ public class EmployeeModel {
                     rs.getInt("E_ID"),
                     rs.getString("E_Name"),
                     rs.getString("E_Email"),
-                    rs.getString("E_Contact")
+                    rs.getString("E_Contact"),
+                    rs.getDouble("hourly_rate")
             );
             employeeList.add(employee);
         }
