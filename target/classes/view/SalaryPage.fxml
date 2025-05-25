@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -17,103 +17,118 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f0f8ff;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.SalaryController">
+<?import java.lang.String?>
+<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.SalaryController">
+    <!-- Main ScrollPane wrapping all content -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <!-- Main Content Container -->
+        <VBox fx:id="mainContent" prefWidth="980" spacing="20" style="-fx-background-color: transparent;">
+            <!-- Header Section -->
+            <HBox alignment="CENTER" style="-fx-background-color: #4e73df; -fx-background-radius: 5;">
+                <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Salary Management">
+                    <padding>
+                        <Insets bottom="15" left="15" right="15" top="15" />
+                    </padding>
+                </Label>
+            </HBox>
 
-    <VBox spacing="15" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
-        <!-- Header -->
-        <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Salary Management System">
-            <font>
-                <Font name="System Bold" size="24.0" />
-            </font>
-            <padding>
-                <Insets bottom="10" />
-            </padding>
-        </Label>
+            <!-- Employee Selection Section -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;">
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Employee:" />
+                <ComboBox fx:id="cmbEmployee" prefWidth="250.0" style="-fx-background-color: #f8f9fc;" />
 
-        <!-- Employee Selection and Month Selection -->
-        <HBox alignment="CENTER_LEFT" spacing="20">
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Select Employee:" />
-            <ComboBox fx:id="cmbEmployee" prefWidth="250.0" style="-fx-background-color: white; -fx-border-color: #bdc3c7;" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Month:" />
+                <ComboBox fx:id="cmbMonth" prefWidth="150.0" style="-fx-background-color: #f8f9fc;">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="January" />
+                            <String fx:value="February" />
+                            <String fx:value="March" />
+                            <String fx:value="April" />
+                            <String fx:value="May" />
+                            <String fx:value="June" />
+                            <String fx:value="July" />
+                            <String fx:value="August" />
+                            <String fx:value="September" />
+                            <String fx:value="October" />
+                            <String fx:value="November" />
+                            <String fx:value="December" />
+                        </FXCollections>
+                    </items>
+                </ComboBox>
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-padding: 0 0 0 20;" text="Select Month:" />
-            <ComboBox fx:id="cmbMonth" prefWidth="150.0" style="-fx-background-color: white; -fx-border-color: #bdc3c7;">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="January" />
-                        <String fx:value="February" />
-                        <String fx:value="March" />
-                        <String fx:value="April" />
-                        <String fx:value="May" />
-                        <String fx:value="June" />
-                        <String fx:value="July" />
-                        <String fx:value="August" />
-                        <String fx:value="September" />
-                        <String fx:value="October" />
-                        <String fx:value="November" />
-                        <String fx:value="December" />
-                    </FXCollections>
-                </items>
-            </ComboBox>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Year:" />
+                <TextField fx:id="txtYear" prefWidth="80.0" promptText="YYYY" style="-fx-background-color: #f8f9fc;" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-padding: 0 0 0 20;" text="Year:" />
-            <TextField fx:id="txtYear" prefWidth="80.0" promptText="YYYY" style="-fx-background-color: white; -fx-border-color: #bdc3c7;" />
+                <Button fx:id="btnLoad" onAction="#loadSalaryData" style="-fx-background-color: #36b9cc; -fx-text-fill: white; -fx-font-weight: bold;" text="Load Data" />
+            </HBox>
 
-            <Button fx:id="btnLoad" onAction="#loadSalaryData" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="Load Data" />
-        </HBox>
+            <!-- Employee Details -->
+            <GridPane hgap="15" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="150" />
+                    <ColumnConstraints minWidth="200" />
+                    <ColumnConstraints minWidth="150" />
+                    <ColumnConstraints minWidth="200" />
+                </columnConstraints>
 
-        <!-- Employee Details -->
-        <GridPane hgap="15" style="-fx-background-color: #eaf2f8; -fx-padding: 15; -fx-border-radius: 5; -fx-background-radius: 5;" vgap="10">
-            <columnConstraints>
-                <ColumnConstraints minWidth="150" />
-                <ColumnConstraints minWidth="200" />
-                <ColumnConstraints minWidth="150" />
-                <ColumnConstraints minWidth="200" />
-            </columnConstraints>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Employee ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Label fx:id="lblEmployeeId" style="-fx-text-fill: #5a5c69;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Employee ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <Label fx:id="lblEmployeeId" style="-fx-text-fill: #2980b9;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Hourly Rate:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <Label fx:id="lblHourlyRate" style="-fx-text-fill: #5a5c69;" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Hourly Rate:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-            <Label fx:id="lblHourlyRate" style="-fx-text-fill: #2980b9;" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Total Working Days:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label fx:id="lblWorkingDays" style="-fx-text-fill: #5a5c69;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Total Working Days:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <Label fx:id="lblWorkingDays" style="-fx-text-fill: #2980b9;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Total Hours Worked:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <Label fx:id="lblTotalHours" style="-fx-text-fill: #5a5c69;" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Total Hours Worked:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <Label fx:id="lblTotalHours" style="-fx-text-fill: #2980b9;" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Monthly Salary:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Label fx:id="lblMonthlySalary" style="-fx-text-fill: #1cc88a; -fx-font-weight: bold; -fx-font-size: 16;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Monthly Salary:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <Label fx:id="lblMonthlySalary" style="-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 16;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Payment Date:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <Label fx:id="lblPaymentDate" style="-fx-text-fill: #e74a3b; -fx-font-weight: bold;" text="10th of each month" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
 
-            <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Payment Date:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            <Label fx:id="lblPaymentDate" style="-fx-text-fill: #e74c3c; -fx-font-weight: bold;" text="10th of each month" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-         <rowConstraints>
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-         </rowConstraints>
-        </GridPane>
+            <!-- Daily Wage Table -->
+            <VBox prefWidth="980" spacing="10" style="-fx-background-color: white; -fx-background-radius: 5;">
+                <padding>
+                    <Insets bottom="15" left="15" right="15" top="15" />
+                </padding>
 
-        <!-- Daily Wage Table -->
-        <Label style="-fx-text-fill: #2c3e50; -fx-font-weight: bold;" text="Daily Wage Calculation" />
-        <TableView fx:id="tblDailyWages" prefHeight="200.0" style="-fx-border-color: #bdc3c7; -fx-border-radius: 5;">
-            <columns>
-                <TableColumn fx:id="colDate" style="-fx-font-weight: bold;" text="Date" />
-                <TableColumn fx:id="colDay" style="-fx-font-weight: bold;" text="Day" />
-                <TableColumn fx:id="colHoursWorked" style="-fx-font-weight: bold;" text="Hours Worked" />
-                <TableColumn fx:id="colDailyWage" style="-fx-font-weight: bold;" text="Daily Wage" />
-                <TableColumn fx:id="colStatus" style="-fx-font-weight: bold;" text="Status" />
-            </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-        </TableView>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;" text="Daily Wage Calculation" />
 
-        <!-- Action Buttons -->
-        <HBox alignment="CENTER" spacing="20">
-            <Button fx:id="btnCalculate" onAction="#calculateSalary" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="Calculate Salary" />
-            <Button fx:id="btnPaySalary" onAction="#paySalary" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="Pay Salary" />
-            <Button fx:id="btnClear" onAction="#clearFields" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;" text="Clear" />
-        </HBox>
-    </VBox>
+                <TableView fx:id="tblDailyWages" prefHeight="300.0" style="-fx-background-color: #f8f9fc;">
+                    <columns>
+                        <TableColumn fx:id="colDate" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Date" />
+                        <TableColumn fx:id="colDay" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Day" />
+                        <TableColumn fx:id="colHoursWorked" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Hours Worked" />
+                        <TableColumn fx:id="colDailyWage" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Daily Wage" />
+                        <TableColumn fx:id="colStatus" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Status" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;">
+                <Button fx:id="btnCalculate" onAction="#calculateSalary" style="-fx-background-color: #1cc88a; -fx-text-fill: white; -fx-font-weight: bold;" text="Calculate Salary" />
+                <Button fx:id="btnPaySalary" onAction="#paySalary" style="-fx-background-color: #e74a3b; -fx-text-fill: white; -fx-font-weight: bold;" text="Pay Salary" />
+                <Button fx:id="btnClear" onAction="#clearFields" style="-fx-background-color: #5a5c69; -fx-text-fill: white; -fx-font-weight: bold;" text="Clear" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Status Bar (fixed at bottom) -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #4e73df; -fx-padding: 5;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <Label fx:id="lblStatus" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Ready" />
+    </HBox>
 </AnchorPane>
