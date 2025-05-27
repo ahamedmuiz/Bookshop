@@ -8,6 +8,8 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -18,8 +20,17 @@
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
         <!-- Main Content Container -->
         <VBox fx:id="mainContent" prefWidth="1080" spacing="20" style="-fx-background-color: transparent;">
-            <!-- Header Section -->
+            <!-- Header Section with Sales Image -->
             <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="1080.0" style="-fx-background-color: #4e73df; -fx-background-radius: 5;">
+                <ImageView fitHeight="40" fitWidth="40" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/sales.jpg" />
+                    </image>
+                    <HBox.margin>
+                        <Insets left="10" />
+                    </HBox.margin>
+                </ImageView>
+
                 <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Sales Analytics Dashboard">
                     <padding>
                         <Insets bottom="15" left="15" right="15" top="15" />

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -9,15 +10,15 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<?import java.lang.String?>
 <AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.SalaryController">
     <!-- Main ScrollPane wrapping all content -->
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
@@ -32,13 +33,18 @@
                 </Label>
             </HBox>
 
-            <!-- Employee Selection Section -->
-            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;">
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Employee:" />
-                <ComboBox fx:id="cmbEmployee" prefWidth="250.0" style="-fx-background-color: #f8f9fc;" />
+            <!-- Employee Selection Section with Image -->
+            <GridPane hgap="15" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
+                <padding>
+                    <Insets bottom="15" left="15" right="15" top="15" />
+                </padding>
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Month:" />
-                <ComboBox fx:id="cmbMonth" prefWidth="150.0" style="-fx-background-color: #f8f9fc;">
+                <!-- Form Fields Column -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Employee:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cmbEmployee" prefWidth="250.0" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Month:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <ComboBox fx:id="cmbMonth" prefWidth="150.0" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="January" />
@@ -57,11 +63,33 @@
                     </items>
                 </ComboBox>
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Year:" />
-                <TextField fx:id="txtYear" prefWidth="80.0" promptText="YYYY" style="-fx-background-color: #f8f9fc;" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Year:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtYear" prefWidth="80.0" promptText="YYYY" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Button fx:id="btnLoad" onAction="#loadSalaryData" style="-fx-background-color: #36b9cc; -fx-text-fill: white; -fx-font-weight: bold;" text="Load Data" />
-            </HBox>
+                <Button fx:id="btnLoad" onAction="#loadSalaryData" style="-fx-background-color: #36b9cc; -fx-text-fill: white; -fx-font-weight: bold;" text="Load Data" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <!-- Image Column -->
+                <ImageView fitHeight="194.0" fitWidth="335.0" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4">
+                    <image>
+                        <Image url="@../images/salary.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="250" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="350" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                </rowConstraints>
+            </GridPane>
 
             <!-- Employee Details -->
             <GridPane hgap="15" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;" vgap="10">

@@ -34,12 +34,13 @@
                 </Label>
             </HBox>
 
-            <!-- Inventory Form Section -->
+            <!-- Inventory Form Section with Image -->
             <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
                 <padding>
                     <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
+                <!-- Form Fields Column -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Inventory ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <TextField fx:id="txtInventoryId" promptText="Enter Inventory ID" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
@@ -78,19 +79,30 @@
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Price:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
                 <TextField fx:id="txtPrice" promptText="Enter Price" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="7" />
 
+                <!-- Image Column -->
+                <ImageView fitHeight="350" fitWidth="400" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="8">
+                    <image>
+                        <Image url="@../images/inventory.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
                 <columnConstraints>
-                    <ColumnConstraints />
-                    <ColumnConstraints />
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="250" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="400" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
                 </rowConstraints>
             </GridPane>
 

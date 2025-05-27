@@ -9,6 +9,8 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -30,12 +32,13 @@
                 </Label>
             </HBox>
 
-            <!-- Employee Selection Section -->
+            <!-- Employee Selection Section with Image -->
             <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
                 <padding>
                     <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
+                <!-- Form Fields Column -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Select Employee:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <ComboBox fx:id="cmbEmployee" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
@@ -48,20 +51,29 @@
                     <Button fx:id="btnReset" onAction="#onResetClicked" prefWidth="100" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;" text="Reset" />
                 </HBox>
 
-                <!-- Add this row for total hours display -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Total Hours Today:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <Label fx:id="lblTotalHours" style="-fx-font-weight: bold;" text="0.00 hours" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
+                <!-- Image Column -->
+                <ImageView fitHeight="194.0" fitWidth="350" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4">
+                    <image>
+                        <Image url="@../images/attendance.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
                 <columnConstraints>
-                    <ColumnConstraints />
-                    <ColumnConstraints />
-                    <ColumnConstraints />
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="350" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="350" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints /> <!-- Added for the new row -->
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
                 </rowConstraints>
             </GridPane>
 

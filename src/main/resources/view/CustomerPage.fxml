@@ -2,12 +2,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -29,33 +30,45 @@
                 </Label>
             </HBox>
 
-            <!-- Customer Form Section -->
+            <!-- Customer Form Section with Image -->
             <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
                 <padding>
                     <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Customer ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <TextField fx:id="txtCustomerId" promptText="Enter Customer ID" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <!-- Form Fields Column -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Customer ID:" />
+                <TextField fx:id="txtCustomerId" promptText="Enter Customer ID" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" />
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Name:" GridPane.rowIndex="1" />
                 <TextField fx:id="txtName" promptText="Enter Full Name" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Email:" GridPane.rowIndex="2" />
                 <TextField fx:id="txtEmail" promptText="Enter Email Address" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Phone:" GridPane.rowIndex="3" />
                 <TextField fx:id="txtPhone" promptText="Enter Phone Number" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
+                <!-- Image Column -->
+                <ImageView fitHeight="243.0" fitWidth="326.0" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowSpan="4">
+                    <image>
+                        <Image url="@../images/customerinformation.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
                 <columnConstraints>
-                    <ColumnConstraints />
-                    <ColumnConstraints />
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="250" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="350" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
+                    <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                    <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                    <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                    <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
                 </rowConstraints>
             </GridPane>
 

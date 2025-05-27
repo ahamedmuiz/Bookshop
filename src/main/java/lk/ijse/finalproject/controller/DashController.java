@@ -36,9 +36,6 @@ public class DashController {
     private Button btnCustomer;
 
     @FXML
-    private Button btnDelivery;
-
-    @FXML
     private Button btnEmployees;
 
     @FXML
@@ -49,9 +46,6 @@ public class DashController {
 
     @FXML
     private Button btnOrders;
-
-    @FXML
-    private Button btnPayments;
 
     @FXML
     private Button btnSalary;
@@ -86,7 +80,7 @@ public class DashController {
 
         // Add all buttons to a list for easy management
         buttonList = new ArrayList<>(List.of(
-                btnInventory, btnCustomer, btnOrders, btnPayments, btnDelivery,
+                btnInventory, btnCustomer, btnOrders,
                 btnSales, btnEmployees, btnSuppliers, btnAttendance, btnSalary, btnLogout
         ));
 
