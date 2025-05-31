@@ -9,7 +9,6 @@ public class DBConnection {
 
     private static DBConnection dbConnection;
     private Connection connection;
-    //testing github
 
     private DBConnection() {
         connect();
