@@ -50,7 +50,7 @@
                 <TextField fx:id="txtPhone" promptText="Enter Phone Number" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
                 <!-- Image Column -->
-                <ImageView fitHeight="243.0" fitWidth="326.0" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowSpan="4">
+                <ImageView fitHeight="196.0" fitWidth="326.0" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowSpan="4">
                     <image>
                         <Image url="@../images/customerinformation.jpg" />
                     </image>

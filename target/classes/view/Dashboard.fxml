@@ -2,43 +2,54 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="674.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.DashController">
    <children>
-      <Label layoutX="0" layoutY="0" prefHeight="70.0" prefWidth="800.0" style="-fx-background-color: #2C3E50; -fx-text-fill: white; -fx-alignment: center;" text="Dashboard" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <!-- Header Section -->
+      <Label layoutX="0" layoutY="0" prefHeight="70.0" prefWidth="800.0" style="-fx-background-color: #2C3E50; -fx-text-fill: white; -fx-alignment: center;" text="Dashboard" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <font>
             <Font name="Arial Bold" size="28.0" />
          </font>
       </Label>
 
-      <!-- Date Label -->
-      <Label fx:id="dateLabel" layoutY="10.0" style="-fx-text-fill: white; -fx-font-size: 16px;" AnchorPane.rightAnchor="70.0" />
-
-      <!-- Time Label -->
-      <Label fx:id="timeLabel" alignment="CENTER_RIGHT" layoutY="30.0" style="-fx-text-fill: white; -fx-font-size: 16px;" AnchorPane.rightAnchor="70.0" />
-
-      <VBox layoutX="10.0" layoutY="80.0" prefHeight="570.0" prefWidth="180.0" spacing="8.0" style="-fx-background-color: #34495E; -fx-padding: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="80.0">
+      <!-- Date and Time Display -->
+      <VBox alignment="CENTER_RIGHT" spacing="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0">
          <children>
-            <Button fx:id="btnInventory" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Inventory" />
-            <Button fx:id="btnCustomer" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Customer Details" />
-            <Button fx:id="btnOrders" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Order placement" />
-            <Button fx:id="btnPayments" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Payments" />
-            <Button fx:id="btnDelivery" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Delivery" />
-            <Button fx:id="btnSales" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Sales Analytics" />
-            <Button fx:id="btnEmployees" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Employee Details" />
-            <Button fx:id="btnSuppliers" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Suppliers" />
-            <Button fx:id="btnAttendance" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Attendance" />
-            <Button fx:id="btnSalary" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Manage Salary" />
-            <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="50.0" prefWidth="160.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Logout" />
-
+            <Label fx:id="dateLabel" style="-fx-text-fill: white; -fx-font-size: 16px;" />
+            <Label fx:id="timeLabel" style="-fx-text-fill: white; -fx-font-size: 16px;" />
          </children>
       </VBox>
 
-      <AnchorPane fx:id="ancMainDashSwitch" layoutX="200.0" layoutY="80.0" prefHeight="570.0" prefWidth="580.0" style="-fx-background-color: #ECF0F1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
-         <Label layoutX="50.0" layoutY="300.0" prefHeight="32.0" prefWidth="344.0" style="-fx-font-size: 22px; -fx-text-fill: #2C3E50;" text="Welcome to the Dashboard!" AnchorPane.bottomAnchor="322.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="166.0" AnchorPane.topAnchor="250.0" />
+      <!-- Navigation Menu - Perfectly Aligned Buttons -->
+      <VBox layoutX="13.0" layoutY="80.0" prefHeight="551.0" prefWidth="180.0" spacing="0" style="-fx-background-color: #34495E; -fx-padding: 10 10 10 10;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="90.0">
+         <children>
+            <Button fx:id="btnInventory" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Manage Inventory" />
+            <Button fx:id="btnCustomer" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Customer Details" />
+            <Button fx:id="btnOrders" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Order Placement" />
+            <Button fx:id="btnSales" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Sales Analytics" />
+            <Button fx:id="btnEmployees" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Employee Details" />
+            <Button fx:id="btnSuppliers" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Manage Suppliers" />
+            <Button fx:id="btnAttendance" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Manage Attendance" />
+            <Button fx:id="btnSalary" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 0 0 0 15; -fx-border-width: 0 0 1 0; -fx-border-color: #2C3E50;" text="Manage Salary" />
+            <Button fx:id="btnLogout" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="63.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center; -fx-border-width: 0;" text="Logout" />
+         </children>
+      </VBox>
+
+      <!-- Main Content Area -->
+      <AnchorPane fx:id="ancMainDashSwitch" layoutX="200.0" layoutY="80.0" prefHeight="570.0" prefWidth="580.0" style="-fx-background-color: #ECF0F1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+         <children>
+            <Label layoutX="50.0" layoutY="300.0" prefHeight="32.0" prefWidth="344.0" style="-fx-font-size: 22px; -fx-text-fill: #2C3E50; -fx-font-weight: bold;" text="Welcome to the Dashboard!" AnchorPane.bottomAnchor="322.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="166.0" AnchorPane.topAnchor="250.0" />
+            <ImageView fitHeight="611.0" fitWidth="1247.0" layoutX="-5.0" layoutY="-4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <image>
+                  <Image url="@../images/DashBoardBackground.jpg" />
+               </image>
+            </ImageView>
+         </children>
       </AnchorPane>
    </children>
 </AnchorPane>

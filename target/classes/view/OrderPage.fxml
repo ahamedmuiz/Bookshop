@@ -8,13 +8,15 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.RowConstraints?>
 <AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.OrderController">
     <!-- Main ScrollPane wrapping all content -->
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
@@ -29,12 +31,13 @@
                 </Label>
             </HBox>
 
-            <!-- Order Information Section -->
+            <!-- Order Information Section with Image -->
             <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
                 <padding>
                     <Insets bottom="15" left="15" right="15" top="15" />
                 </padding>
 
+                <!-- Form Fields Column -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Order ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <Label fx:id="lblOrderId" style="-fx-text-fill: #5a5c69;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
@@ -65,20 +68,31 @@
                     <Button onAction="#btnAddToCartOnAction" style="-fx-background-color: #1cc88a; -fx-text-fill: white; -fx-font-weight: bold;" text="Add to Cart" />
                 </HBox>
 
+                <!-- Image Column -->
+                <ImageView fitHeight="300" fitWidth="400" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="9">
+                    <image>
+                        <Image url="@../images/placeorder.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
                 <columnConstraints>
-                    <ColumnConstraints />
-                    <ColumnConstraints />
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="200" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="400" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
-                    <RowConstraints />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
                 </rowConstraints>
             </GridPane>
 
