@@ -6,11 +6,21 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import lk.ijse.finalproject.db.DBConnection;
 import lk.ijse.finalproject.dto.CustomerDto;
 import lk.ijse.finalproject.model.CustomerModel;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
+import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CustomerController {
@@ -74,6 +84,58 @@ public class CustomerController {
     }
 
     @FXML
+    void handleGenerateOrderReport(ActionEvent event) {
+        if (currentCustomer == null) {
+            showAlert(Alert.AlertType.WARNING, "Please select a customer first!");
+            return;
+        }
+
+        if (currentCustomer.getCId() <= 0) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Customer ID");
+            return;
+        }
+
+        generateCustomerOrderReport(currentCustomer.getCId());
+    }
+
+    private void generateCustomerOrderReport(int customerId) {
+        try {
+            InputStream reportStream = getClass().getResourceAsStream("/report/customer_orders.jrxml");
+            if (reportStream == null) {
+                throw new RuntimeException("Customer Order Report not found!");
+            }
+
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("customer_id", customerId);
+
+            Connection connection = DBConnection.getInstance().getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("Database connection unavailable");
+            }
+
+            // Quick connection test
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("SELECT 1");
+            }
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
+            JasperViewer viewer = new JasperViewer(jasperPrint, false);
+            viewer.setTitle("Customer Order Report");
+            viewer.setVisible(true);
+
+        } catch (JRException | SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Report Generation Error: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Unexpected Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    @FXML
     void handleAdd(ActionEvent event) {
         try {
             CustomerDto dto = getCustomerDtoFromForm();
@@ -98,7 +160,6 @@ public class CustomerController {
 
             CustomerDto dto = getCustomerDtoFromForm();
 
-            // Check if any fields have changed
             if (!isCustomerModified(dto)) {
                 showAlert(Alert.AlertType.INFORMATION, "No changes detected. Nothing was updated.");
                 return;
