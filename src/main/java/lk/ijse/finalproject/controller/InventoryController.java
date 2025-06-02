@@ -4,8 +4,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import lk.ijse.finalproject.dto.InventoryDto;
 import lk.ijse.finalproject.dto.tm.InventoryTm;
 import lk.ijse.finalproject.model.InventoryModel;
@@ -13,18 +15,12 @@ import lk.ijse.finalproject.model.SupplierModel;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 public class InventoryController {
 
-    @FXML private Button btnAdd;
-    @FXML private Button btnClear;
-    @FXML private Button btnDelete;
-    @FXML private Button btnLoadAll;
-    @FXML private Button btnSearch;
-    @FXML private Button btnSearchAnyField;
-    @FXML private Button btnUpdate;
     @FXML private ComboBox<String> cmbQuantityOperation;
     @FXML private ComboBox<String> cmbSupplierId;
     @FXML private TableColumn<?, ?> colCategory;
@@ -45,6 +41,9 @@ public class InventoryController {
     @FXML private TextField txtSearch;
     @FXML private TextField txtSupplierName;
 
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private InventoryDto originalDto = null;
+
     public void initialize() {
         setCellValueFactory();
         loadSupplierIds();
@@ -52,15 +51,10 @@ public class InventoryController {
         generateNextInventoryId();
         setListener();
         loadAllInventory();
-
-        // Add table selection listener
-        tblInventory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                setFields(newSelection);
-            }
-        });
+        addTextValidations();
+        dpLastUpdate.setValue(LocalDate.now());
+        txtInventoryId.setEditable(false);
     }
-
 
     private void setCellValueFactory() {
         colInventoryId.setCellValueFactory(new PropertyValueFactory<>("invId"));
@@ -83,7 +77,7 @@ public class InventoryController {
     }
 
     private void loadQuantityOperations() {
-        cmbQuantityOperation.getItems().addAll("Add", "Subtract", "Set");
+        cmbQuantityOperation.getItems().addAll("Add", "Subtract");
         cmbQuantityOperation.getSelectionModel().selectFirst();
     }
 
@@ -106,7 +100,6 @@ public class InventoryController {
                     showAlert("Failed to get supplier name", Alert.AlertType.ERROR);
                 }
             }
-            updateButtonStates();
         });
 
         cmbQuantityOperation.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -123,21 +116,32 @@ public class InventoryController {
 
         tblInventory.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                setFields(newSelection);
+                try {
+                    originalDto = new InventoryDto(
+                            Integer.parseInt(newSelection.getInvId()),
+                            Integer.parseInt(newSelection.getSupId()),
+                            newSelection.getSupplierName(),
+                            newSelection.getStockQty(),
+                            newSelection.getLastUpdate(),
+                            newSelection.getCategory(),
+                            newSelection.getPrice()
+                    );
+                    setFields(originalDto);
+                } catch (NumberFormatException e) {
+                    showAlert("Error converting inventory data", Alert.AlertType.ERROR);
+                }
             }
-            updateButtonStates();
         });
     }
-
 
     private void calculateNewQuantity() {
         String operation = cmbQuantityOperation.getValue();
         String adjustmentText = txtQuantityAdjustment.getText();
         String currentQtyText = txtCurrentQuantity.getText();
 
-        if (operation != null && !adjustmentText.isEmpty() && !currentQtyText.isEmpty()) {
+        if (operation != null && !adjustmentText.isEmpty()) {
             try {
-                int currentQty = Integer.parseInt(currentQtyText);
+                int currentQty = currentQtyText.isEmpty() ? 0 : Integer.parseInt(currentQtyText);
                 int adjustment = Integer.parseInt(adjustmentText);
                 int newQty = currentQty;
 
@@ -151,9 +155,6 @@ public class InventoryController {
                             showAlert("Cannot have negative quantity!", Alert.AlertType.WARNING);
                             return;
                         }
-                        break;
-                    case "Set":
-                        newQty = adjustment;
                         break;
                 }
 
@@ -178,23 +179,6 @@ public class InventoryController {
         });
     }
 
-    private void setupButtonStates() {
-        boolean formValid = cmbSupplierId.getValue() != null &&
-                !isEmpty(txtNewQuantity.getText()) &&
-                !isEmpty(txtCategory.getText()) &&
-                !isEmpty(txtPrice.getText());
-
-        boolean hasSelection = tblInventory.getSelectionModel().getSelectedItem() != null;
-
-        btnAdd.setDisable(!formValid || hasSelection);
-        btnUpdate.setDisable(!formValid || !hasSelection);
-        btnDelete.setDisable(!hasSelection);
-    }
-
-    private boolean isEmpty(String text) {
-        return text == null || text.trim().isEmpty();
-    }
-
     @FXML
     void btnAddInventory(ActionEvent event) {
         try {
@@ -207,25 +191,30 @@ public class InventoryController {
                 clearFields();
                 generateNextInventoryId();
                 loadAllInventory();
+                dpLastUpdate.setValue(LocalDate.now());
             }
         } catch (SQLException e) {
             showAlert("Failed to save inventory: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-
-
-
     @FXML
     void btnUpdateInventory(ActionEvent event) {
         try {
-            InventoryTm selectedItem = tblInventory.getSelectionModel().getSelectedItem();
-            if (selectedItem == null) {
+            if (originalDto == null) {
                 showAlert("Please select an item to update", Alert.AlertType.WARNING);
                 return;
             }
 
             if (!validateForm()) return;
+
+            InventoryDto updatedDto = getInventoryDto();
+
+            // Check if any changes were made
+            if (areDtosEqual(originalDto, updatedDto)) {
+                showAlert("No changes detected. Nothing to update.", Alert.AlertType.INFORMATION);
+                return;
+            }
 
             Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
             confirmation.setTitle("Confirm Update");
@@ -234,18 +223,29 @@ public class InventoryController {
 
             Optional<ButtonType> result = confirmation.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                InventoryDto dto = getInventoryDto();
-                boolean isUpdated = InventoryModel.updateInventory(dto);
+                boolean isUpdated = InventoryModel.updateInventory(updatedDto);
                 if (isUpdated) {
                     showAlert("Inventory updated successfully", Alert.AlertType.INFORMATION);
                     clearFields();
                     generateNextInventoryId();
                     loadAllInventory();
+                    dpLastUpdate.setValue(LocalDate.now());
+                    originalDto = null;
                 }
             }
         } catch (SQLException e) {
             showAlert("Failed to update inventory: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private boolean areDtosEqual(InventoryDto dto1, InventoryDto dto2) {
+        return dto1.getInvId() == dto2.getInvId() &&
+                dto1.getSupId() == dto2.getSupId() &&
+                dto1.getSupplierName().equals(dto2.getSupplierName()) &&
+                dto1.getStockQty() == dto2.getStockQty() &&
+                dto1.getLastUpdate().equals(dto2.getLastUpdate()) &&
+                dto1.getCategory().equals(dto2.getCategory()) &&
+                Double.compare(dto1.getPrice(), dto2.getPrice()) == 0;
     }
 
     @FXML
@@ -279,25 +279,59 @@ public class InventoryController {
 
     @FXML
     void btnSearchInventory(ActionEvent event) {
-        String invId = txtInventoryId.getText();
-        if (isEmpty(invId)) {
-            showAlert("Please enter an inventory ID", Alert.AlertType.ERROR);
-            return;
-        }
+        // Create search dialog
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Search Inventory");
+        dialog.setHeaderText("Search by Inventory ID or Category");
 
-        try {
-            InventoryDto dto = InventoryModel.searchInventory(invId);
-            if (dto != null) {
-                setFields(dto);
-                selectTableRow(dto);
-            } else {
-                showAlert("Inventory not found", Alert.AlertType.INFORMATION);
+        // Set the button types
+        ButtonType searchButtonType = new ButtonType("Search", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(searchButtonType, ButtonType.CANCEL);
+
+        // Create search fields
+        TextField txtSearchId = new TextField();
+        txtSearchId.setPromptText("Inventory ID");
+        TextField txtSearchCategory = new TextField();
+        txtSearchCategory.setPromptText("Category");
+
+        VBox vbox = new VBox(10,
+                new Label("Inventory ID:"), txtSearchId,
+                new Label("Category:"), txtSearchCategory
+        );
+        vbox.setPadding(new Insets(20));
+        dialog.getDialogPane().setContent(vbox);
+
+        // Show dialog and wait for response
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.isPresent() && result.get() == searchButtonType) {
+            String searchId = txtSearchId.getText().trim();
+            String searchCategory = txtSearchCategory.getText().trim();
+
+            try {
+                List<InventoryDto> inventoryList;
+                if (!searchId.isEmpty()) {
+                    inventoryList = InventoryModel.searchInventoryByIdOrName(searchId);
+                } else if (!searchCategory.isEmpty()) {
+                    inventoryList = InventoryModel.searchInventoryByAnyField(searchCategory);
+                } else {
+                    showAlert("Please enter either ID or Category to search", Alert.AlertType.WARNING);
+                    return;
+                }
+
+                if (inventoryList.isEmpty()) {
+                    showAlert("No matching records found", Alert.AlertType.INFORMATION);
+                } else {
+                    populateTable(inventoryList);
+                    if (inventoryList.size() == 1) {
+                        setFields(inventoryList.get(0));
+                    }
+                }
+            } catch (SQLException e) {
+                showAlert("Error searching inventory: " + e.getMessage(), Alert.AlertType.ERROR);
             }
-        } catch (SQLException e) {
-            showAlert(e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-
 
     @FXML
     void btnSearchAnyField(ActionEvent event) {
@@ -323,6 +357,7 @@ public class InventoryController {
     void btnClearForm(ActionEvent event) {
         clearFields();
         generateNextInventoryId();
+        dpLastUpdate.setValue(LocalDate.now());
     }
 
     @FXML
@@ -334,17 +369,6 @@ public class InventoryController {
     void btnclearField(ActionEvent event) {
         txtSearch.clear();
         loadAllInventory();
-    }
-
-    private void setFields(InventoryTm tm) {
-        txtInventoryId.setText(tm.getInvId());
-        cmbSupplierId.setValue(tm.getSupId());
-        txtSupplierName.setText(tm.getSupplierName());
-        txtCurrentQuantity.setText(String.valueOf(tm.getStockQty()));
-        txtNewQuantity.setText(String.valueOf(tm.getStockQty()));
-        dpLastUpdate.setValue(tm.getLastUpdate());
-        txtCategory.setText(tm.getCategory());
-        txtPrice.setText(String.valueOf(tm.getPrice()));
     }
 
     private void setFields(InventoryDto dto) {
@@ -366,10 +390,10 @@ public class InventoryController {
         txtNewQuantity.clear();
         txtQuantityAdjustment.clear();
         cmbQuantityOperation.getSelectionModel().selectFirst();
-        dpLastUpdate.setValue(null);
         txtCategory.clear();
         txtPrice.clear();
         tblInventory.getSelectionModel().clearSelection();
+        originalDto = null;
     }
 
     private void loadAllInventory() {
@@ -404,84 +428,24 @@ public class InventoryController {
         new Alert(alertType, message).show();
     }
 
-    private void updateButtonStates() {
-        boolean isFormValid = isFormValid();
-        boolean hasTableSelection = tblInventory.getSelectionModel().getSelectedItem() != null;
-
-        // Enable/disable buttons based on form state and selection
-        btnAdd.setDisable(!isFormValid || hasTableSelection);
-        btnUpdate.setDisable(!isFormValid || !hasTableSelection);
-        btnDelete.setDisable(!hasTableSelection);
-        btnClear.setDisable(!isFormValid && !hasTableSelection);
-
-        // Search buttons are always enabled
-        btnSearch.setDisable(false);
-        btnSearchAnyField.setDisable(false);
-        btnLoadAll.setDisable(false);
-    }
-
-    private boolean isFormValid() {
-        // Check all required fields are filled and valid
-        return cmbSupplierId.getValue() != null &&
-                !txtNewQuantity.getText().isEmpty() &&
-                !txtCategory.getText().isEmpty() &&
-                !txtPrice.getText().isEmpty() &&
-                isValidNumber(txtNewQuantity.getText()) &&
-                isValidDecimal(txtPrice.getText());
-    }
-
-    private boolean isValidNumber(String text) {
-        try {
-            Integer.parseInt(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean isValidDecimal(String text) {
-        try {
-            Double.parseDouble(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     private boolean validateForm() {
-        // Validate supplier selection
         if (cmbSupplierId.getValue() == null || cmbSupplierId.getValue().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please select a supplier").show();
+            showAlert("Please select a supplier", Alert.AlertType.WARNING);
             return false;
         }
 
-        // Validate quantity
-        if (txtNewQuantity.getText().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please enter a quantity").show();
-            return false;
-        }
-        try {
-            Integer.parseInt(txtNewQuantity.getText());
-        } catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.WARNING, "Quantity must be a valid number").show();
+        if (isEmpty(txtNewQuantity.getText())) {
+            showAlert("Please enter a quantity", Alert.AlertType.WARNING);
             return false;
         }
 
-        // Validate category
-        if (txtCategory.getText().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please enter a category").show();
+        if (isEmpty(txtCategory.getText())) {
+            showAlert("Please enter a category", Alert.AlertType.WARNING);
             return false;
         }
 
-        // Validate price
-        if (txtPrice.getText().isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Please enter a price").show();
-            return false;
-        }
-        try {
-            Double.parseDouble(txtPrice.getText());
-        } catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.WARNING, "Price must be a valid number").show();
+        if (isEmpty(txtPrice.getText())) {
+            showAlert("Please enter a price", Alert.AlertType.WARNING);
             return false;
         }
 
@@ -489,24 +453,20 @@ public class InventoryController {
     }
 
     private InventoryDto getInventoryDto() {
+        LocalDate lastUpdate = dpLastUpdate.getValue() != null ? dpLastUpdate.getValue() : LocalDate.now();
+
         return new InventoryDto(
                 Integer.parseInt(txtInventoryId.getText()),
                 Integer.parseInt(cmbSupplierId.getValue()),
                 txtSupplierName.getText(),
                 Integer.parseInt(txtNewQuantity.getText()),
-                dpLastUpdate.getValue() != null ? dpLastUpdate.getValue() : LocalDate.now(),
+                lastUpdate,
                 txtCategory.getText(),
                 Double.parseDouble(txtPrice.getText())
         );
     }
 
-    private void selectTableRow(InventoryDto dto) {
-        tblInventory.getItems().stream()
-                .filter(item -> item.getInvId().equals(String.valueOf(dto.getInvId())))
-                .findFirst()
-                .ifPresent(item -> {
-                    tblInventory.getSelectionModel().select(item);
-                    tblInventory.scrollTo(item);
-                });
+    private boolean isEmpty(String text) {
+        return text == null || text.trim().isEmpty();
     }
 }

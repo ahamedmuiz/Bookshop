@@ -17,5 +17,3 @@ public class InventoryDto {
         private String category;
         private double price;
 }
-
-

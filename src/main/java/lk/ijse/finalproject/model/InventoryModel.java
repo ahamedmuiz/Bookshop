@@ -5,41 +5,38 @@ import lk.ijse.finalproject.util.CrudUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryModel {
     public static boolean saveInventory(InventoryDto dto) throws SQLException {
         String sql = "INSERT INTO Inventory(Inv_ID, Sup_ID, Stock_Qty, Last_Update, Category, Price) VALUES(?, ?, ?, ?, ?, ?)";
-        return CrudUtil.execute(sql, dto.getInvId(), dto.getSupId(), dto.getStockQty(), dto.getLastUpdate(), dto.getCategory(), dto.getPrice());
+        return CrudUtil.execute(sql,
+                dto.getInvId(),
+                dto.getSupId(),
+                dto.getStockQty(),
+                dto.getLastUpdate(),
+                dto.getCategory(),
+                dto.getPrice()
+        );
     }
 
     public static boolean updateInventory(InventoryDto dto) throws SQLException {
         String sql = "UPDATE Inventory SET Sup_ID = ?, Stock_Qty = ?, Last_Update = ?, Category = ?, Price = ? WHERE Inv_ID = ?";
-        return CrudUtil.execute(sql, dto.getSupId(), dto.getStockQty(), dto.getLastUpdate(), dto.getCategory(), dto.getPrice(), dto.getInvId());
+        return CrudUtil.execute(sql,
+                dto.getSupId(),
+                dto.getStockQty(),
+                dto.getLastUpdate(),
+                dto.getCategory(),
+                dto.getPrice(),
+                dto.getInvId()
+        );
     }
 
     public static boolean deleteInventory(String invId) throws SQLException {
         String sql = "DELETE FROM Inventory WHERE Inv_ID = ?";
         return CrudUtil.execute(sql, invId);
-    }
-
-    public static InventoryDto searchInventory(String invId) throws SQLException {
-        String sql = "SELECT * FROM Inventory WHERE Inv_ID = ?";
-        ResultSet resultSet = CrudUtil.execute(sql, invId);
-
-        if (resultSet.next()) {
-            return new InventoryDto(
-                    resultSet.getInt("Inv_ID"),
-                    resultSet.getInt("Sup_ID"),
-                    null, // Supplier name will be set separately
-                    resultSet.getInt("Stock_Qty"),
-                    resultSet.getDate("Last_Update").toLocalDate(),
-                    resultSet.getString("Category"),
-                    resultSet.getDouble("Price")
-            );
-        }
-        return null;
     }
 
     public static List<InventoryDto> getAllInventory() throws SQLException {
@@ -63,9 +60,29 @@ public class InventoryModel {
 
     public static List<InventoryDto> searchInventoryByAnyField(String searchText) throws SQLException {
         String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID " +
-                "WHERE i.Inv_ID LIKE ? OR i.Category LIKE ? OR s.Name LIKE ?";
+                "WHERE i.Category LIKE ?";
         searchText = "%" + searchText + "%";
-        ResultSet resultSet = CrudUtil.execute(sql, searchText, searchText, searchText);
+        ResultSet resultSet = CrudUtil.execute(sql, searchText);
+
+        List<InventoryDto> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(new InventoryDto(
+                    resultSet.getInt("Inv_ID"),
+                    resultSet.getInt("Sup_ID"),
+                    resultSet.getString("SupplierName"),
+                    resultSet.getInt("Stock_Qty"),
+                    resultSet.getDate("Last_Update").toLocalDate(),
+                    resultSet.getString("Category"),
+                    resultSet.getDouble("Price")
+            ));
+        }
+        return list;
+    }
+
+    public static List<InventoryDto> searchInventoryByIdOrName(String searchText) throws SQLException {
+        String sql = "SELECT i.*, s.Name AS SupplierName FROM Inventory i LEFT JOIN Supplier s ON i.Sup_ID = s.Sup_ID " +
+                "WHERE i.Inv_ID = ?";
+        ResultSet resultSet = CrudUtil.execute(sql, searchText);
 
         List<InventoryDto> list = new ArrayList<>();
         while (resultSet.next()) {

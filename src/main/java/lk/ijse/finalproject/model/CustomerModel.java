@@ -10,7 +10,18 @@ import java.util.List;
 
 public class CustomerModel {
 
-    // Existing methods
+    public int generateNextCustomerId() throws SQLException {
+        String sql = "SELECT C_ID FROM Customer ORDER BY C_ID DESC LIMIT 1";
+        try (Connection con = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) + 1;
+            }
+            return 1;
+        }
+    }
+
     public boolean addCustomer(CustomerDto dto) throws SQLException {
         String sql = "INSERT INTO Customer (C_ID, Name, Email, Contact) VALUES (?, ?, ?, ?)";
         try (Connection con = DBConnection.getInstance().getConnection();
@@ -23,7 +34,6 @@ public class CustomerModel {
         }
     }
 
-    // New required methods
     public String findNameById(String customerId) throws SQLException {
         String sql = "SELECT Name FROM Customer WHERE C_ID = ?";
         try (Connection con = DBConnection.getInstance().getConnection();
@@ -47,7 +57,6 @@ public class CustomerModel {
         }
     }
 
-    // Other existing methods remain unchanged...
     public boolean updateCustomer(CustomerDto dto) throws SQLException {
         String sql = "UPDATE Customer SET Name=?, Email=?, Contact=? WHERE C_ID=?";
         try (Connection con = DBConnection.getInstance().getConnection();
@@ -88,6 +97,27 @@ public class CustomerModel {
         try (Connection con = DBConnection.getInstance().getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
+            List<CustomerDto> list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(new CustomerDto(
+                        rs.getInt("C_ID"),
+                        rs.getString("Name"),
+                        rs.getString("Email"),
+                        rs.getString("Contact")));
+            }
+            return list;
+        }
+    }
+
+    public List<CustomerDto> searchCustomersByIdOrName(String searchTerm) throws SQLException {
+        String sql = "SELECT * FROM Customer WHERE C_ID LIKE ? OR Name LIKE ?";
+        try (Connection con = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            String likeTerm = "%" + searchTerm + "%";
+            ps.setString(1, likeTerm);
+            ps.setString(2, likeTerm);
+
+            ResultSet rs = ps.executeQuery();
             List<CustomerDto> list = new ArrayList<>();
             while (rs.next()) {
                 list.add(new CustomerDto(

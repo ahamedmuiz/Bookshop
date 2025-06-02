@@ -38,7 +38,7 @@
 
                 <!-- Form Fields Column -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Customer ID:" />
-                <TextField fx:id="txtCustomerId" promptText="Enter Customer ID" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" />
+                <TextField fx:id="txtCustomerId" promptText="Auto Generated" editable="false" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" />
 
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Name:" GridPane.rowIndex="1" />
                 <TextField fx:id="txtName" promptText="Enter Full Name" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
