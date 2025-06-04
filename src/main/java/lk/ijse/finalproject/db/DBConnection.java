@@ -33,7 +33,7 @@ public class DBConnection {
 
     public Connection getConnection() {
         if (isConnectionClosed()) {
-            connect(); // Reconnect if connection is closed
+            connect();
         }
         return connection;
     }

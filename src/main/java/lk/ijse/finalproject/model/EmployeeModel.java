@@ -9,6 +9,17 @@ import java.util.List;
 
 public class EmployeeModel {
 
+    public static int generateNextEmployeeId() throws SQLException, ClassNotFoundException {
+        String sql = "SELECT E_ID FROM Employee ORDER BY E_ID DESC LIMIT 1";
+        Connection con = DBConnection.getInstance().getConnection();
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        if (rs.next()) {
+            return rs.getInt("E_ID") + 1;
+        }
+        return 1; // First employee
+    }
 
     public static boolean addEmployee(EmployeeDto employee) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO Employee (E_ID, E_Name, E_Email, E_Contact, hourly_rate) VALUES (?, ?, ?, ?, ?)";
@@ -59,6 +70,28 @@ public class EmployeeModel {
             );
         }
         return null;
+    }
+
+    public static List<EmployeeDto> searchEmployeesByIdOrName(String searchTerm) throws SQLException, ClassNotFoundException {
+        List<EmployeeDto> employeeList = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE E_ID LIKE ? OR E_Name LIKE ?";
+        Connection con = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = con.prepareStatement(sql);
+        pstm.setString(1, "%" + searchTerm + "%");
+        pstm.setString(2, "%" + searchTerm + "%");
+        ResultSet rs = pstm.executeQuery();
+
+        while (rs.next()) {
+            EmployeeDto employee = new EmployeeDto(
+                    rs.getInt("E_ID"),
+                    rs.getString("E_Name"),
+                    rs.getString("E_Email"),
+                    rs.getString("E_Contact"),
+                    rs.getDouble("hourly_rate")
+            );
+            employeeList.add(employee);
+        }
+        return employeeList;
     }
 
     public static List<EmployeeDto> getAllEmployees() throws SQLException, ClassNotFoundException {

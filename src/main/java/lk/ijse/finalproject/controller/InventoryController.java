@@ -210,7 +210,6 @@ public class InventoryController {
 
             InventoryDto updatedDto = getInventoryDto();
 
-            // Check if any changes were made
             if (areDtosEqual(originalDto, updatedDto)) {
                 showAlert("No changes detected. Nothing to update.", Alert.AlertType.INFORMATION);
                 return;
@@ -279,16 +278,14 @@ public class InventoryController {
 
     @FXML
     void btnSearchInventory(ActionEvent event) {
-        // Create search dialog
+
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Search Inventory");
         dialog.setHeaderText("Search by Inventory ID or Category");
 
-        // Set the button types
         ButtonType searchButtonType = new ButtonType("Search", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(searchButtonType, ButtonType.CANCEL);
 
-        // Create search fields
         TextField txtSearchId = new TextField();
         txtSearchId.setPromptText("Inventory ID");
         TextField txtSearchCategory = new TextField();
@@ -301,7 +298,6 @@ public class InventoryController {
         vbox.setPadding(new Insets(20));
         dialog.getDialogPane().setContent(vbox);
 
-        // Show dialog and wait for response
         Optional<ButtonType> result = dialog.showAndWait();
 
         if (result.isPresent() && result.get() == searchButtonType) {

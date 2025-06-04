@@ -133,14 +133,14 @@ public class AttendanceController {
 
             if (lastAttendance != null && lastAttendance.getDate().equals(selectedDate) &&
                     lastAttendance.getTimeOut() == null) {
-                // Employee is currently clocked in
+
                 currentAttendanceId = lastAttendance.getAttId();
                 btnClockIn.setDisable(true);
                 btnClockOut.setDisable(false);
                 lblStatus.setText("Currently clocked in since " + lastAttendance.getTimeIn());
                 hoursUpdateTimer.play();
             } else {
-                // Employee is not clocked in
+
                 btnClockIn.setDisable(false);
                 btnClockOut.setDisable(true);
                 lblStatus.setText("Ready");

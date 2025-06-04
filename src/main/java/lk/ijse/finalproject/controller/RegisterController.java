@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 public class RegisterController {
 
@@ -42,30 +43,93 @@ public class RegisterController {
     @FXML
     private TextField username;
 
+    // Validation patterns
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z]{2,50}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{4,20}$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
+
     @FXML
     void register(ActionEvent event) {
-        String fname = firstName.getText();
-        String lname = lastName.getText();
-        String userEmail = email.getText();
-        String user = username.getText();
+        String fname = firstName.getText().trim();
+        String lname = lastName.getText().trim();
+        String userEmail = email.getText().trim();
+        String user = username.getText().trim();
         String pass = password.getText();
         String confirmPass = confirmPassword.getText();
 
-        if (fname.isEmpty() || lname.isEmpty() || userEmail.isEmpty() || user.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Form Error!", "Please fill all fields.");
-            return;
-        }
-
-        if (!pass.equals(confirmPass)) {
-            showAlert(Alert.AlertType.ERROR, "Password Mismatch!", "Passwords do not match.");
+        // Validate fields
+        if (!validateFields(fname, lname, userEmail, user, pass, confirmPass)) {
             return;
         }
 
         if (saveUser(fname, lname, userEmail, user, pass)) {
             showAlert(Alert.AlertType.INFORMATION, "Success", "User registered successfully!");
+            navigateToLogin(event); // Navigate to login page after successful registration
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Registration failed. Try again.");
         }
+    }
+
+    private boolean validateFields(String fname, String lname, String email,
+                                   String username, String password, String confirmPass) {
+        // Check empty fields
+        if (fname.isEmpty() || lname.isEmpty() || email.isEmpty() ||
+                username.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Form Error!", "Please fill all fields.");
+            return false;
+        }
+
+        // Validate first name
+        if (!NAME_PATTERN.matcher(fname).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid First Name",
+                    "First name must:\n- Be 2-50 characters\n- Contain only letters");
+            firstName.requestFocus();
+            return false;
+        }
+
+        // Validate last name
+        if (!NAME_PATTERN.matcher(lname).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Last Name",
+                    "Last name must:\n- Be 2-50 characters\n- Contain only letters");
+            lastName.requestFocus();
+            return false;
+        }
+
+        // Validate email
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Email",
+                    "Please enter a valid email address (e.g., example@domain.com)");
+            this.email.requestFocus();
+            return false;
+        }
+
+        // Validate username
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Username",
+                    "Username must:\n- Be 4-20 characters\n- Contain only letters, numbers and underscores");
+            this.username.requestFocus();
+            return false;
+        }
+
+        // Validate password
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Weak Password",
+                    "Password must:\n- Be at least 8 characters\n- Contain at least one digit\n- " +
+                            "Contain at least one lowercase and uppercase letter\n- " +
+                            "Contain at least one special character (@#$%^&+=)");
+            this.password.requestFocus();
+            return false;
+        }
+
+        // Check password match
+        if (!password.equals(confirmPass)) {
+            showAlert(Alert.AlertType.ERROR, "Password Mismatch", "Passwords do not match.");
+            confirmPassword.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
     private boolean saveUser(String fname, String lname, String email, String username, String password) {
@@ -84,7 +148,23 @@ public class RegisterController {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Username or email already exists. Please try different ones.");
             return false;
+        }
+    }
+
+    private void navigateToLogin(ActionEvent event) {
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Parent parent = FXMLLoader.load(getClass().getResource("/view/LoginPage.fxml"));
+            Scene scene = new Scene(parent);
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Failed to load login page.");
         }
     }
 
@@ -105,5 +185,4 @@ public class RegisterController {
         stage.setTitle("Login");
         stage.show();
     }
-
 }

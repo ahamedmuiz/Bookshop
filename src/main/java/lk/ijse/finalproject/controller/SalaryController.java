@@ -73,7 +73,7 @@ public class SalaryController {
     }
 
     private void setDefaultMonthAndYear() {
-        // Set current month and year by default
+
         cmbMonth.getSelectionModel().select(LocalDate.now().getMonth().toString());
         txtYear.setText(String.valueOf(LocalDate.now().getYear()));
     }
@@ -100,11 +100,9 @@ public class SalaryController {
                 LocalDate startDate = yearMonth.atDay(1);
                 LocalDate endDate = yearMonth.atEndOfMonth();
 
-                // Get working days and total hours using the new methods
                 int workingDays = AttendanceModel.getWorkingDaysCount(selectedEmployeeId, startDate, endDate);
                 double totalHours = AttendanceModel.getTotalHoursWorked(selectedEmployeeId, startDate, endDate);
 
-                // Get detailed attendance for the table
                 List<AttendanceDto> attendanceList = SalaryModel.getAttendanceForMonth(selectedEmployeeId, month, year);
 
                 obList.clear();
@@ -158,7 +156,6 @@ public class SalaryController {
                     currentHourlyRate = employee.getHourly_rate();
                 }
 
-                // Check if salary already paid for this month
                 String month = cmbMonth.getValue();
                 int year = Integer.parseInt(txtYear.getText());
                 if (SalaryModel.isSalaryPaid(selectedEmployeeId, month, year)) {

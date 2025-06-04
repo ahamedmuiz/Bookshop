@@ -60,7 +60,6 @@ public class SupplierModel {
         return list;
     }
 
-    // Updated to return List<Integer> as required by SupplierController
     public static List<Integer> getAllSupplierIds() throws SQLException {
         String sql = "SELECT Sup_ID FROM Supplier";
         ResultSet rs = CrudUtil.execute(sql);
@@ -78,7 +77,6 @@ public class SupplierModel {
         return rs.next();
     }
 
-    // New method to get supplier names as List<String>
     public static List<String> getAllSupplierNames() throws SQLException {
         String sql = "SELECT Name FROM Supplier";
         ResultSet rs = CrudUtil.execute(sql);
@@ -90,14 +88,12 @@ public class SupplierModel {
         return list;
     }
 
-    // Helper method to get supplier name by ID (returns String)
     public static String getSupplierName(Object supplierId) throws SQLException {
         String sql = "SELECT Name FROM Supplier WHERE Sup_ID = ?";
         int id = (supplierId instanceof String) ? Integer.parseInt((String) supplierId) : (Integer) supplierId;
         ResultSet rs = CrudUtil.execute(sql, id);
         return rs.next() ? rs.getString("Name") : null;
     }
-
 
     public static int generateNextSupplierId() throws SQLException {
         String sql = "SELECT Sup_ID FROM Supplier ORDER BY Sup_ID DESC LIMIT 1";

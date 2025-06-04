@@ -54,6 +54,9 @@ public class DashController {
     private Button btnSales;
 
     @FXML
+    private Button btnSystemUsers ;
+
+    @FXML
     private Button btnSuppliers;
 
     @FXML
@@ -67,10 +70,9 @@ public class DashController {
 
     @FXML
     public void initialize() {
-        // Set current date
+
         dateLabel.setText(LocalDate.now().toString());
 
-        // Set current time and update every second
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             timeLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         }));
@@ -78,10 +80,9 @@ public class DashController {
         clock.setCycleCount(Timeline.INDEFINITE);
         clock.play();
 
-        // Add all buttons to a list for easy management
         buttonList = new ArrayList<>(List.of(
                 btnInventory, btnCustomer, btnOrders,
-                btnSales, btnEmployees, btnSuppliers, btnAttendance, btnSalary, btnLogout
+                btnSales, btnEmployees, btnSuppliers, btnAttendance, btnSalary,btnSystemUsers, btnLogout
         ));
 
         btnLogout.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white;");
@@ -92,7 +93,6 @@ public class DashController {
     void handleButtonClick(ActionEvent event) throws IOException {
         Button clickedButton = (Button) event.getSource();
 
-        // If logout clicked popup confirmation box
         if (clickedButton == btnLogout) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Logout Confirmation");
@@ -150,7 +150,9 @@ public class DashController {
         else if (clickedButton == btnSalary) {
             loadUI("SalaryPage");
         }
-
+        else if (clickedButton == btnSystemUsers) {
+            loadUI("SystemUsersPage");
+        }
     }
 
 

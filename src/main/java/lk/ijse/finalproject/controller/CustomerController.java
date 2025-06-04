@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class CustomerController {
 
@@ -38,6 +39,11 @@ public class CustomerController {
 
     private CustomerDto currentCustomer;
     private final CustomerModel customerModel = new CustomerModel();
+
+    // Regular expressions for validation
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z ]{3,50}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^0[0-9]{9}$");
 
     public void initialize() {
         colId.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getCId()).asObject());
@@ -115,7 +121,6 @@ public class CustomerController {
                 throw new SQLException("Database connection unavailable");
             }
 
-            // Quick connection test
             try (Statement stmt = connection.createStatement()) {
                 stmt.execute("SELECT 1");
             }
@@ -134,10 +139,13 @@ public class CustomerController {
         }
     }
 
-
     @FXML
     void handleAdd(ActionEvent event) {
         try {
+            if (!validateFields()) {
+                return;
+            }
+
             CustomerDto dto = getCustomerDtoFromForm();
             if (customerModel.addCustomer(dto)) {
                 showAlert(Alert.AlertType.INFORMATION, "Customer Added!");
@@ -155,6 +163,10 @@ public class CustomerController {
         try {
             if (currentCustomer == null) {
                 showAlert(Alert.AlertType.WARNING, "Please select a customer to update!");
+                return;
+            }
+
+            if (!validateFields()) {
                 return;
             }
 
@@ -260,6 +272,36 @@ public class CustomerController {
         txtName.clear();
         txtEmail.clear();
         txtPhone.clear();
+    }
+
+    private boolean validateFields() {
+        // Validate Name
+        if (txtName.getText().isEmpty() || !NAME_PATTERN.matcher(txtName.getText()).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Name!\n" +
+                    "- Must be 3-50 characters long\n" +
+                    "- Can only contain letters and spaces");
+            txtName.requestFocus();
+            return false;
+        }
+
+        // Validate Email
+        if (txtEmail.getText().isEmpty() || !EMAIL_PATTERN.matcher(txtEmail.getText()).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Email Address!\n" +
+                    "Please enter a valid email (e.g., example@domain.com)");
+            txtEmail.requestFocus();
+            return false;
+        }
+
+        // Validate Phone
+        if (txtPhone.getText().isEmpty() || !PHONE_PATTERN.matcher(txtPhone.getText()).matches()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Phone Number!\n" +
+                    "- Must be 10 digits\n" +
+                    "- Must start with 0 (e.g., 0771234567)");
+            txtPhone.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
     private void showAlert(Alert.AlertType type, String message) {

@@ -77,7 +77,7 @@ public class OrderController implements Initializable {
     }
 
     private void loadInventoryIds() throws SQLException {
-        // Assuming bookModel.getAllBookIds() now returns List<Integer>
+
         List<Integer> inventoryIds = bookModel.getAllBookIds();
         cmbItemId.setItems(FXCollections.observableArrayList(inventoryIds));
     }
@@ -96,9 +96,9 @@ public class OrderController implements Initializable {
 
     @FXML
     void cmbItemOnAction(ActionEvent event) throws SQLException {
-        Integer invId = cmbItemId.getValue();  // Now using Integer
+        Integer invId = cmbItemId.getValue();
         if (invId != null) {
-            BookDto inventoryItem = bookModel.findById(invId);  // Updated to use int
+            BookDto inventoryItem = bookModel.findById(invId);
             if (inventoryItem != null) {
                 lblItemName.setText(inventoryItem.getCategory());
                 lblItemQty.setText(String.valueOf(inventoryItem.getQty()));
@@ -109,7 +109,7 @@ public class OrderController implements Initializable {
 
     @FXML
     void btnAddToCartOnAction(ActionEvent event) {
-        Integer selectedInvId = cmbItemId.getValue();  // Now using Integer
+        Integer selectedInvId = cmbItemId.getValue();
         String cartQtyString = txtAddToCartQty.getText();
 
         if (!validateCartAddition(selectedInvId, cartQtyString)) return;

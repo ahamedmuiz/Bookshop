@@ -14,7 +14,6 @@ public class AttendanceDto {
     private String status;
     private double hourlyRate;
 
-    // Removed confusing constructor with Object parameters
     public AttendanceDto(String attId, int empId, String empName, LocalDate date, LocalTime timeIn,
                          LocalTime timeOut, double hoursWorked, String status, double hourlyRate) {
         this.attId = attId;
@@ -28,12 +27,10 @@ public class AttendanceDto {
         this.hourlyRate = hourlyRate;
     }
 
-    // Added simplified constructor for clock-in
     public AttendanceDto(String attId, int empId, LocalDate date, LocalTime timeIn, String status) {
         this(attId, empId, null, date, timeIn, null, 0, status, 0);
     }
 
-    // Getters and Setters
     public String getAttId() {
         return attId;
     }

@@ -9,8 +9,8 @@ import lombok.*;
 @Setter
 @ToString
 public class CartTm {
-    private String invId;  // Changed from bId to invId
-    private String category;  // Changed from name to category
+    private String invId;
+    private String category;
     private int qty;
     private double price;
     private double total;

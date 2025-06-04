@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.finalproject.controller.SystemUsersController">
+    <!-- Main ScrollPane wrapping all content -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <!-- Main Content Container -->
+        <VBox fx:id="mainContent" prefWidth="980" spacing="20" style="-fx-background-color: transparent;">
+            <!-- Header Section -->
+            <HBox alignment="CENTER" style="-fx-background-color: #4e73df; -fx-background-radius: 5;">
+                <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="System Users Management">
+                    <padding>
+                        <Insets bottom="15" left="15" right="15" top="15" />
+                    </padding>
+                </Label>
+            </HBox>
+
+            <!-- User Form Section with Image -->
+            <GridPane hgap="10" prefWidth="980" style="-fx-background-color: white; -fx-background-radius: 5;" vgap="15">
+                <padding>
+                    <Insets bottom="15" left="15" right="15" top="15" />
+                </padding>
+
+                <!-- Form Fields Column -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtUserId" style="-fx-background-color: #f0f0f0;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtFirstName" promptText="Enter First Name" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Last Name:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtLastName" promptText="Enter Last Name" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtEmail" promptText="Enter Email" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <TextField fx:id="txtUsername" promptText="Enter Username" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <TextField fx:id="txtPassword" promptText="Enter Password" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df;" text="Confirm Password:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <TextField fx:id="txtConfirmPassword" promptText="Confirm Password" style="-fx-background-color: #f8f9fc;" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                <!-- Image Column -->
+                <ImageView fitHeight="300" fitWidth="400" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="7">
+                    <image>
+                        <Image url="@../images/users.jpg" />
+                    </image>
+                    <GridPane.margin>
+                        <Insets left="20" />
+                    </GridPane.margin>
+                </ImageView>
+
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="150" prefWidth="250" />
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="200" prefWidth="400" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                    <RowConstraints minHeight="30" prefHeight="30" vgrow="NEVER" />
+                </rowConstraints>
+            </GridPane>
+
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER" spacing="15" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 15;">
+                <Button onAction="#btnUserUpdate" prefWidth="100" style="-fx-background-color: #36b9cc; -fx-text-fill: white; -fx-font-weight: bold;" text="Update" />
+                <Button onAction="#btnUserDelete" prefWidth="100" style="-fx-background-color: #e74a3b; -fx-text-fill: white; -fx-font-weight: bold;" text="Delete" />
+                <Button onAction="#btnUserSearch" prefWidth="100" style="-fx-background-color: #f6c23e; -fx-text-fill: white; -fx-font-weight: bold;" text="Search" />
+                <Button onAction="#btnLoadAllUsers" prefWidth="100" style="-fx-background-color: #858796; -fx-text-fill: white; -fx-font-weight: bold;" text="Load All" />
+                <Button onAction="#btnClearUserPage" prefWidth="100" style="-fx-background-color: #5a5c69; -fx-text-fill: white; -fx-font-weight: bold;" text="Clear" />
+            </HBox>
+
+            <!-- Users Table -->
+            <VBox prefWidth="980" spacing="10" style="-fx-background-color: white; -fx-background-radius: 5;">
+                <padding>
+                    <Insets bottom="15" left="15" right="15" top="15" />
+                </padding>
+
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 16px;" text="User Records" />
+
+                <TableView fx:id="tblUsers" prefHeight="300.0" style="-fx-background-color: #f8f9fc;" onMouseClicked="#tblUsersOnMouseClicked">
+                    <columns>
+                        <TableColumn fx:id="colUserId" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="User ID" />
+                        <TableColumn fx:id="colFirstName" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="First Name" />
+                        <TableColumn fx:id="colLastName" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Last Name" />
+                        <TableColumn fx:id="colEmail" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Email" />
+                        <TableColumn fx:id="colUsername" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Username" />
+                        <TableColumn fx:id="colPassword" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Password" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Status Bar (fixed at bottom) -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #4e73df; -fx-padding: 5;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <Label fx:id="lblStatus" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Ready" />
+    </HBox>
+</AnchorPane>
