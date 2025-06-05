@@ -120,7 +120,7 @@ public class SalaryController {
                 tblDailyWages.setItems(obList);
                 lblWorkingDays.setText(String.valueOf(workingDays));
                 lblTotalHours.setText(String.format("%.2f", totalHours));
-                lblMonthlySalary.setText(String.format("$%.2f", totalHours * currentHourlyRate));
+                lblMonthlySalary.setText(String.format("Rs. %.2f", totalHours * currentHourlyRate));
 
             } catch (SQLException e) {
                 showAlert("Failed to calculate salary: " + e.getMessage(), Alert.AlertType.ERROR);
@@ -152,7 +152,7 @@ public class SalaryController {
                 EmployeeDto employee = EmployeeModel.searchEmployee(String.valueOf(selectedEmployeeId));
                 if (employee != null) {
                     lblEmployeeId.setText(String.valueOf(employee.getE_ID()));
-                    lblHourlyRate.setText(String.format("$%.2f", employee.getHourly_rate()));
+                    lblHourlyRate.setText(String.format("Rs. %.2f", employee.getHourly_rate()));
                     currentHourlyRate = employee.getHourly_rate();
                 }
 
@@ -174,7 +174,7 @@ public class SalaryController {
             try {
                 String month = cmbMonth.getValue();
                 int year = Integer.parseInt(txtYear.getText());
-                double totalSalary = Double.parseDouble(lblMonthlySalary.getText().replace("$", ""));
+                double totalSalary = Double.parseDouble(lblMonthlySalary.getText().replace("Rs. ", ""));
 
                 String salaryId = SalaryModel.generateNextSalaryId();
                 LocalDate paymentDate = LocalDate.now(); // Pay on current date

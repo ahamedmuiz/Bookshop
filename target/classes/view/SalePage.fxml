@@ -89,7 +89,7 @@
                         <TableColumn fx:id="colOrderDate" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Date" />
                         <TableColumn fx:id="colAmount" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Amount (LKR)" />
                         <TableColumn fx:id="colStatus" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Status" />
-                        <TableColumn fx:id="colPayment" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Payment" />
+                        <TableColumn fx:id="colPayment" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Payment Mode" />
                         <TableColumn fx:id="colActions" style="-fx-text-fill: #4e73df; -fx-font-weight: bold;" text="Actions" />
                     </columns>
                     <columnResizePolicy>
